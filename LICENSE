@@ -1,21 +1,36 @@
-MIT License
+# Licencias de Warp
 
 Copyright (c) 2026 Ginés López Montalbán
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Este repositorio utiliza una licencia dual según el tipo de contenido.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+## Código — MIT License
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+El código fuente, scripts y otros archivos ejecutables o programáticos se
+distribuyen bajo la MIT License.
+
+Ámbito previsto: `scripts/` y cualquier archivo de código, script o utilidad programática presente o futura.
+
+Consulta [`LICENSE-CODE`](LICENSE-CODE) para el texto completo de la MIT License.
+
+## Documentación y metodología — CC BY-SA 4.0
+
+La documentación, metodología, arquitectura, especificaciones, plantillas,
+diagramas y demás contenido textual o conceptual se distribuyen bajo
+Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0).
+
+Ámbito previsto: `README.md`, `docs/` y demás documentación, metodología, especificaciones, plantillas, diagramas y contenido textual.
+
+Puedes compartir y adaptar este material, incluso con fines comerciales,
+siempre que:
+
+1. atribuyas adecuadamente la autoría original a Ginés López Montalbán;
+2. indiques si has realizado cambios; y
+3. distribuyas las adaptaciones bajo la misma licencia CC BY-SA 4.0.
+
+Consulta [`LICENSE-DOCS`](LICENSE-DOCS) para la referencia formal de la licencia.
+
+## Prevalencia
+
+Si un archivo contiene una declaración de licencia propia, esa declaración
+prevalece para ese archivo.

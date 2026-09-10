@@ -555,9 +555,9 @@ Las líneas futuras quedan fuera del core actual:
 
 ## 15. Licencia
 
-Warp se distribuye bajo licencia **MIT**.
+Warp se distribuye bajo licencia dual: el código (`scripts/`) bajo **MIT**, y la documentación y metodología (`docs/`, `README.md`) bajo **CC BY-SA 4.0**.
 
-Consulta [`LICENSE`](LICENSE).
+Consulta [`LICENSE`](LICENSE), [`LICENSE-CODE`](LICENSE-CODE) y [`LICENSE-DOCS`](LICENSE-DOCS).
 
 ---
 
