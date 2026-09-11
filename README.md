@@ -530,6 +530,8 @@ Las líneas futuras quedan fuera del core actual:
 .
 ├── README.md
 ├── LICENSE
+├── LICENSE-CODE
+├── LICENSE-DOCS
 │
 ├── docs/
 │   ├── core/
@@ -542,14 +544,21 @@ Las líneas futuras quedan fuera del core actual:
 │   │   ├── DOCUMENT_INDEX.md
 │   │   └── *_TEMPLATE.md
 │   │
-│   └── threads/
-│       └── example/
-│           ├── MANIFEST.md
-│           └── HANDOFF.md
+│   ├── threads/
+│   │   └── example/
+│   │       ├── MANIFEST.md
+│   │       └── HANDOFF.md
+│   │
+│   └── evaluaciones/
+│       ├── README.md
+│       ├── INFORME_VIABILIDAD.md
+│       └── INFORME_FASE2_GRAFO.md
 │
 └── scripts/
     └── check_knowledge.py
 ```
+
+`docs/evaluaciones/` recoge informes de evaluación y propuestas de evolución que todavía no forman parte del core canónico: no son metodología vigente, son análisis y disparadores para decisiones futuras.
 
 ---
 
