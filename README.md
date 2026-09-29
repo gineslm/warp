@@ -1,295 +1,297 @@
 # Warp
 
-> Arquitectura de conocimiento para coordinar trabajo entre personas y agentes de IA sin depender de la memoria de una conversación concreta.
+> **Note:** this repository's documentation and code are written in Spanish. This README is an English summary for readers who don't read Spanish. → [Leer en español](README.es.md)
 
-Warp es una metodología y una arquitectura de trabajo basada en Git. Su objetivo es mantener **conocimiento, responsabilidad y estado** de forma persistente cuando un proyecto se reparte entre múltiples conversaciones, agentes o herramientas que no comparten memoria entre sí.
+> A knowledge architecture for coordinating work between people and AI agents without depending on the memory of any single conversation.
 
-La idea base es sencilla:
+Warp is a methodology and a Git-based working architecture. Its goal is to keep **knowledge, responsibility, and state** persistent when a project is spread across multiple conversations, agents, or tools that don't share memory with each other.
 
-> **la conversación es efímera; el repositorio es la memoria durable.**
+The core idea is simple:
 
-Warp no nació como un ejercicio abstracto de arquitectura. Surgió durante la investigación **Design to Code**, al comprobar que una metodología por etapas podía estructurar bien el proceso, pero no resolvía por sí sola un problema distinto: **cómo coordinar contextos aislados sin perder coherencia, trazabilidad ni responsabilidad**.
+> **the conversation is ephemeral; the repository is the durable memory.**
 
-→ Investigación de origen: [Design to Code](https://github.com/gineslm/design-to-code)
+Warp didn't start as an abstract architecture exercise. It emerged during the **Design to Code** research, when it became clear that a staged methodology could structure the process well, but couldn't by itself solve a different problem: **how to coordinate isolated contexts without losing coherence, traceability, or responsibility**.
 
----
-
-## 1. El problema
-
-Trabajar con agentes de IA produce conocimiento útil, pero ese conocimiento suele quedar repartido entre conversaciones:
-
-- una instancia investiga;
-- otra diseña;
-- otra implementa;
-- otra revisa;
-- ninguna comparte automáticamente la memoria de las demás.
-
-Cuando el trabajo crece aparecen varios síntomas:
-
-- decisiones repetidas o contradictorias;
-- contexto que hay que reconstruir una y otra vez;
-- dificultad para saber cuál es el estado vigente;
-- responsabilidades mezcladas dentro de una misma conversación;
-- dependencia excesiva de la memoria del agente o de la persona que estuvo presente;
-- conocimiento importante atrapado en historiales conversacionales.
-
-El problema no es sólo de almacenamiento.
-
-Es también de **responsabilidad**:
-
-> ¿quién puede cambiar qué?, ¿cómo llega una propuesta a quien tiene autoridad para resolverla?, ¿cómo se incorpora un agente nuevo sin rehacer toda la historia?
-
-Warp intenta responder a esas preguntas con un modelo pequeño y explícito.
+→ Originating research: [Design to Code](https://github.com/gineslm/design-to-code)
 
 ---
 
-## 2. De dónde surge
+## 1. The problem
 
-La investigación [Design to Code](https://github.com/gineslm/design-to-code) estudiaba un flujo asistido por agentes:
+Working with AI agents produces useful knowledge, but that knowledge tends to end up scattered across conversations:
+
+- one instance researches;
+- another designs;
+- another implements;
+- another reviews;
+- none of them automatically shares the others' memory.
+
+As the work grows, several symptoms appear:
+
+- repeated or contradictory decisions;
+- context that has to be rebuilt over and over;
+- difficulty knowing what the current state actually is;
+- responsibilities mixed within a single conversation;
+- excessive dependence on the memory of the agent or the person who was present;
+- important knowledge trapped in conversation histories.
+
+The problem isn't only about storage.
+
+It's also about **responsibility**:
+
+> Who can change what? How does a proposal reach whoever has the authority to resolve it? How does a new agent get onboarded without redoing the whole history?
+
+Warp tries to answer those questions with a small, explicit model.
+
+---
+
+## 2. Where it comes from
+
+The [Design to Code](https://github.com/gineslm/design-to-code) research studied an agent-assisted flow:
 
 ```text
-definición
+definition
    ↓
-diseño
+design
    ↓
-implementación
+implementation
 ```
 
-De ese trabajo se extrajo una metodología basada en principios como:
+That work produced a methodology based on principles such as:
 
-- reducción de ambigüedad;
-- trazabilidad;
-- enriquecimiento acumulativo;
-- gates de validación;
-- retroactividad controlada;
-- contratos entre etapas.
+- ambiguity reduction;
+- traceability;
+- cumulative enrichment;
+- validation gates;
+- controlled retroactivity;
+- contracts between stages.
 
-Mientras esa metodología se desarrollaba, el trabajo empezó a repartirse entre múltiples conversaciones y herramientas.
+While that methodology was being developed, the work started to be spread across multiple conversations and tools.
 
-Ahí apareció un problema de segundo orden:
+That's where a second-order problem appeared:
 
-> **las instancias no comparten memoria y el estado del proyecto puede desincronizarse.**
+> **instances don't share memory, and the project's state can fall out of sync.**
 
-El primer intento de resolverlo utilizó documentos-puente, estados y sincronización humana.
+The first attempt to solve it used bridge documents, states, and human synchronization.
 
-Warp nace al separar ese problema del flujo design-to-code y convertirlo en una cuestión arquitectónica independiente:
+Warp was born by splitting that problem off from the design-to-code flow and turning it into its own architectural question:
 
-> **¿cómo mantener conocimiento y responsabilidad coherentes cuando múltiples agentes trabajan sobre un mismo proyecto a lo largo del tiempo?**
+> **how do you keep knowledge and responsibility coherent when multiple agents work on the same project over time?**
 
 ---
 
-## 3. La idea: tejer conocimiento
+## 3. The idea: weaving knowledge
 
-El nombre viene del telar.
+The name comes from the loom.
 
-La **urdimbre** (*warp*) es el conjunto de hilos paralelos tensados sobre el bastidor que da estructura a todo lo que se teje encima.
+The **warp** is the set of parallel threads stretched across the frame that gives structure to everything woven on top of it.
 
-En Warp, cada **THREAD** es una línea persistente de responsabilidad.
+In Warp, each **THREAD** is a persistent line of responsibility.
 
-El conocimiento se construye alrededor de esos THREADs.
+Knowledge is built around those THREADs.
 
-Git conserva la historia.
+Git keeps the history.
 
-Los agentes son temporales e intercambiables.
+Agents are temporary and interchangeable.
 
 ```mermaid
 flowchart TB
-  human(("Persona"))
-  agent1(("Agente A"))
-  agent2(("Agente B"))
+  human(("Person"))
+  agent1(("Agent A"))
+  agent2(("Agent B"))
 
-  subgraph repo["Repositorio Git · conocimiento + historia"]
+  subgraph repo["Git repository · knowledge + history"]
     TA["THREAD A<br/>MANIFEST · HANDOFF"]
     TB["THREAD B<br/>MANIFEST · HANDOFF"]
-    DOCS["Corpus documental"]
+    DOCS["Documentation corpus"]
   end
 
   human --> TA
-  agent1 -->|"se incorpora mediante MANIFEST"| TA
-  agent2 -->|"se incorpora mediante MANIFEST"| TB
-  TB -->|"input pendiente"| TA
+  agent1 -->|"joins via MANIFEST"| TA
+  agent2 -->|"joins via MANIFEST"| TB
+  TB -->|"pending input"| TA
   TA --> DOCS
   TB --> DOCS
 ```
 
 ---
 
-## 4. El modelo
+## 4. The model
 
-Warp separa explícitamente varias cosas que suelen mezclarse:
+Warp explicitly separates several things that tend to get mixed together:
 
 ```text
-unidad de trabajo
+unit of work
       ↓ 
-unidad de conocimiento
+unit of knowledge
       ↓ 
-unidad de autoridad
+unit of authority
       ↓ 
-agente que trabaja
+acting agent
 ```
 
-Sus piezas principales son:
+Its main pieces are:
 
 ### THREAD
 
-Una línea persistente de responsabilidad.
+A persistent line of responsibility.
 
-No es una conversación, una persona ni un agente.
+It is not a conversation, a person, or an agent.
 
-Un THREAD existe si y sólo si existe su **MANIFEST**.
+A THREAD exists if and only if its **MANIFEST** exists.
 
-Puede seguir vivo aunque cambie el agente que trabaja sobre él.
+It can stay alive even as the agent working on it changes.
 
-Puede cerrarse y reabrirse.
+It can be closed and reopened.
 
 ---
 
 ### MANIFEST
 
-El contrato actual del THREAD.
+The THREAD's current contract.
 
-Declara lo que Git no puede inferir por sí solo:
+It declares what Git can't infer on its own:
 
-- identidad;
-- responsabilidad;
-- estado;
-- alcance;
-- autoridad documental;
-- dependencias relevantes;
-- HANDOFF asociado.
+- identity;
+- responsibility;
+- state;
+- scope;
+- document authority;
+- relevant dependencies;
+- associated HANDOFF.
 
-El agente se incorpora al THREAD leyendo su MANIFEST.
+The agent joins the THREAD by reading its MANIFEST.
 
 ---
 
 ### HANDOFF
 
-La bandeja de entrada persistente de un THREAD.
+A THREAD's persistent inbox.
 
-Contiene exclusivamente **inputs pendientes procedentes de otros THREADs**:
+It contains exclusively **pending inputs coming from other THREADs**:
 
-- propuestas;
-- revisiones;
-- necesidades;
-- tareas inter-THREAD.
+- proposals;
+- reviews;
+- needs;
+- inter-THREAD tasks.
 
-El trabajo propio del THREAD no se encola en su propio HANDOFF.
+A THREAD's own work is not queued in its own HANDOFF.
 
-El THREAD receptor evalúa y resuelve cada entrada.
+The receiving THREAD evaluates and resolves each entry.
 
-Cuando una entrada se resuelve, se elimina en el mismo commit que aplica o registra la decisión.
+When an entry is resolved, it's removed in the same commit that applies or logs the decision.
 
-Por tanto:
+So:
 
 ```text
-HANDOFF = presente pendiente
-Git      = pasado resuelto
+HANDOFF = pending present
+Git     = resolved past
 ```
 
 ---
 
-### Corpus documental
+### Documentation corpus
 
-El corpus es común para lectura.
+The corpus is shared for reading.
 
-Cualquier THREAD puede consultar el conocimiento que necesita.
+Any THREAD can consult the knowledge it needs.
 
-Pero cada documento tiene una **autoridad única de evolución**.
+But each document has a **single authority for evolving it**.
 
 ```text
-lectura
+reading
 → global
 
-edición
-→ autoridad explícita
+editing
+→ explicit authority
 ```
 
-Si un THREAD necesita modificar conocimiento bajo autoridad de otro, no edita directamente: propone el cambio a través del HANDOFF del THREAD responsable.
+If a THREAD needs to modify knowledge under another THREAD's authority, it doesn't edit it directly: it proposes the change through the responsible THREAD's HANDOFF.
 
 ---
 
 ### Git
 
-Git es el sustrato histórico.
+Git is the historical substrate.
 
-Conserva:
+It preserves:
 
-- autoría;
-- fechas;
+- authorship;
+- dates;
 - diffs;
-- estados anteriores;
-- evolución de las decisiones.
+- previous states;
+- the evolution of decisions.
 
-Warp evita duplicar manualmente información que Git ya conoce.
+Warp avoids manually duplicating information Git already knows.
 
 ---
 
-## 5. Cómo se mueve el conocimiento
+## 5. How knowledge moves
 
-La regla básica es:
+The basic rule is:
 
 ```text
 THREAD A
   ↓
-  ↓ necesita cambiar conocimiento bajo autoridad de B
+  ↓ needs to change knowledge under B's authority
   ↓
 HANDOFF B
   ↓
   ↓
-THREAD B evalúa
+THREAD B evaluates
   ↓
   ↓
-documento bajo autoridad de B
+document under B's authority
 ```
 
-Esto permite que el conocimiento sea transversal sin convertir la edición en una responsabilidad compartida y ambigua.
+This lets knowledge be cross-cutting without turning editing into a shared, ambiguous responsibility.
 
-Cuando un documento es transversal y ninguna responsabilidad existente debería dominarlo, Warp contempla crear un THREAD específico de gestión con autoridad única sobre ese documento.
+When a document is cross-cutting and no existing responsibility should own it, Warp allows for creating a dedicated management THREAD with sole authority over that document.
 
 ---
 
-## 6. Agentes intercambiables
+## 6. Interchangeable agents
 
-El agente no es la memoria del proyecto.
+The agent is not the project's memory.
 
-Un agente nuevo debería poder reconstruir el contexto necesario desde el repositorio:
+A new agent should be able to rebuild the context it needs from the repository:
 
 ```text
-contexto mínimo
+minimal context
       ↓
-índices
+indexes
       ↓
 MANIFEST
       ↓
 HANDOFF
       ↓
-corpus relevante
+relevant corpus
 ```
 
-Esto permite cambiar de:
+This allows switching:
 
-- conversación;
-- instancia;
-- modelo;
-- herramienta;
+- conversation;
+- instance;
+- model;
+- tool;
 
-sin redefinir el THREAD.
+without redefining the THREAD.
 
-El agente es un actor temporal.
+The agent is a temporary actor.
 
-La responsabilidad persiste.
+Responsibility persists.
 
 ---
 
-## 7. Superficie mínima
+## 7. Minimal surface
 
-Warp adopta **divulgación progresiva**.
+Warp adopts **progressive disclosure**.
 
-Un agente no carga por defecto toda la arquitectura ni todas las reglas.
+An agent doesn't load the entire architecture or all the rules by default.
 
-Lee sólo lo necesario para el trabajo ordinario y consulta documentación más extensa cuando la operación lo exige.
+It reads only what's needed for ordinary work and consults more extensive documentation only when the operation requires it.
 
-La superficie de entrada es:
+The entry surface is:
 
 ```text
 PROJECT_AGENT_CONTEXT
@@ -300,177 +302,177 @@ MANIFEST
         ↓
 HANDOFF
         ↓
-corpus relevante
+relevant corpus
 ```
 
-Las reglas completas se cargan bajo demanda para operaciones como:
+Full rules are loaded on demand for operations such as:
 
-- crear un THREAD;
-- cambiar autoridad documental;
-- resolver HANDOFFs;
-- cerrar o reabrir responsabilidades;
-- modificar la propia arquitectura.
+- creating a THREAD;
+- changing document authority;
+- resolving HANDOFFs;
+- closing or reopening responsibilities;
+- modifying the architecture itself.
 
-Reducir contexto no reduce obligaciones.
+Reducing context does not reduce obligations.
 
 ---
 
-## 8. Validación estructural
+## 8. Structural validation
 
-Las invariantes que pueden comprobarse mecánicamente no deberían depender sólo de disciplina manual.
+Invariants that can be checked mechanically shouldn't depend only on manual discipline.
 
-Warp incluye:
+Warp includes:
 
 ```bash
 python scripts/check_knowledge.py
 ```
 
-El comprobador valida, entre otras cosas:
+The checker validates, among other things:
 
-- existencia y coherencia de THREADs;
-- relación MANIFEST → HANDOFF;
-- consistencia de índices;
-- autoridad documental declarada;
-- referencias a archivos;
-- estructura reconocible de entradas HANDOFF;
-- patrones básicos de secretos.
+- existence and coherence of THREADs;
+- the MANIFEST → HANDOFF relationship;
+- index consistency;
+- declared document authority;
+- file references;
+- recognizable structure of HANDOFF entries;
+- basic secret patterns.
 
-El checker no sustituye juicio humano.
+The checker doesn't replace human judgment.
 
-No decide si:
+It doesn't decide whether:
 
-- una responsabilidad está bien formulada;
-- una decisión es correcta;
-- un cambio pertenece conceptualmente a un THREAD;
-- una dependencia semántica es válida.
+- a responsibility is well formulated;
+- a decision is correct;
+- a change conceptually belongs to a THREAD;
+- a semantic dependency is valid.
 
-Automatiza estructura, no criterio.
-
----
-
-## 9. Principios de diseño
-
-### Un commit = una decisión
-
-El commit intenta representar una unidad coherente de cambio.
-
-Su mensaje explica por qué cambia el conocimiento, no sólo qué líneas se editaron.
-
-### Git guarda la historia; los documentos representan el presente
-
-No se mantiene un segundo historial manual encima de Git.
-
-### Lectura global, autoridad de escritura explícita
-
-El corpus puede ser común sin que la capacidad de modificarlo sea difusa.
-
-### Agentes intercambiables
-
-El sistema no depende de conservar una conversación concreta.
-
-### HANDOFF sólo inter-THREAD
-
-El trabajo propio se resuelve dentro del THREAD y se materializa directamente en documentos bajo su autoridad.
-
-### Procedencia explícita sólo cuando aporta significado
-
-Autoría editorial, fecha y diff ya viven en Git.
-
-Las relaciones de procedencia que sí tienen significado epistemológico pueden declararse explícitamente.
-
-### Carga progresiva de contexto
-
-Se lee lo mínimo necesario y se amplía sólo cuando la operación lo requiere.
+It automates structure, not judgment.
 
 ---
 
-## 10. Qué no es Warp
+## 9. Design principles
 
-Warp no pretende ser:
+### One commit = one decision
 
-- una plataforma multiagente;
-- un orquestador autónomo;
-- una memoria vectorial para LLMs;
-- un sistema de tickets;
-- un sustituto de Git;
-- un Knowledge Graph;
-- una afirmación de haber inventado primitivas inéditas.
+A commit tries to represent a coherent unit of change.
 
-Es una arquitectura de trabajo para **producción y evolución de conocimiento durable con agentes**.
+Its message explains why the knowledge changed, not just which lines were edited.
+
+### Git holds the history; documents represent the present
+
+No second, manual history is maintained on top of Git.
+
+### Global reading, explicit write authority
+
+The corpus can be shared without the ability to modify it being diffuse.
+
+### Interchangeable agents
+
+The system doesn't depend on preserving any specific conversation.
+
+### HANDOFF only for inter-THREAD work
+
+A THREAD's own work is resolved within the THREAD and materialized directly in documents under its authority.
+
+### Explicit provenance only when it adds meaning
+
+Editorial authorship, date, and diff already live in Git.
+
+Provenance relationships that do carry epistemic meaning can be declared explicitly.
+
+### Progressive context loading
+
+The minimum necessary is read, and only expanded when the operation requires it.
 
 ---
 
-## 11. Relación con Design to Code
+## 10. What Warp is not
 
-Design to Code y Warp forman parte de la misma genealogía, pero responden a preguntas distintas.
+Warp doesn't claim to be:
+
+- a multi-agent platform;
+- an autonomous orchestrator;
+- a vector memory for LLMs;
+- a ticketing system;
+- a replacement for Git;
+- a knowledge graph;
+- a claim of having invented novel primitives.
+
+It's a working architecture for **producing and evolving durable knowledge with agents**.
+
+---
+
+## 11. Relationship to Design to Code
+
+Design to Code and Warp are part of the same lineage, but they answer different questions.
 
 ### Design to Code
 
-Pregunta principal:
+Main question:
 
-> **¿cómo debe avanzar y validarse un proceso asistido por agentes?**
+> **how should an agent-assisted process move forward and be validated?**
 
-Resultado:
+Result:
 
-- investigación experimental;
-- metodología por etapas;
-- contratos entre capas;
-- reducción de ambigüedad;
-- trazabilidad;
+- experimental research;
+- staged methodology;
+- contracts between layers;
+- ambiguity reduction;
+- traceability;
 - gates;
 - specs;
-- evaluación de fidelidad y replicabilidad.
+- fidelity and replicability evaluation.
 
 ### Warp
 
-Pregunta principal:
+Main question:
 
-> **¿cómo mantener conocimiento y responsabilidad coherentes cuando múltiples agentes trabajan sin compartir memoria?**
+> **how do you keep knowledge and responsibility coherent when multiple agents work without sharing memory?**
 
-Resultado:
+Result:
 
-- THREADs persistentes;
+- persistent THREADs;
 - MANIFESTs;
 - HANDOFFs;
-- autoridad documental;
-- corpus común;
-- Git como historia;
-- agentes intercambiables;
-- superficie mínima;
-- validación estructural.
+- document authority;
+- shared corpus;
+- Git as history;
+- interchangeable agents;
+- minimal surface;
+- structural validation.
 
-La relación puede resumirse así:
+The relationship can be summarized as:
 
 ```text
 Design to Code
-→ investiga un proceso
-→ extrae una metodología
-→ descubre un problema de coordinación
+→ investigates a process
+→ extracts a methodology
+→ discovers a coordination problem
 
 Warp
-→ toma ese problema
-→ lo abstrae
-→ desarrolla una arquitectura de conocimiento
+→ takes that problem
+→ abstracts it
+→ develops a knowledge architecture
 ```
 
-→ [Ver Design to Code](https://github.com/gineslm/design-to-code)
+→ [See Design to Code](https://github.com/gineslm/design-to-code)
 
 ---
 
-## 12. Evaluación crítica
+## 12. Critical evaluation
 
-Warp no inventa desde cero conceptos como:
+Warp doesn't invent from scratch concepts such as:
 
 - ownership;
-- memoria compartida;
+- shared memory;
 - bounded contexts;
 - decision records;
 - message passing;
-- trazabilidad;
-- gobernanza federada;
-- versionado como historial.
+- traceability;
+- federated governance;
+- versioning as history.
 
-El modelo se contrastó posteriormente con familias como:
+The model was later compared against families such as:
 
 - DDD / Bounded Contexts;
 - Data Mesh;
@@ -479,52 +481,52 @@ El modelo se contrastó posteriormente con familias como:
 - IBIS;
 - W3C PROV;
 - Team Topologies;
-- arquitecturas Blackboard;
-- sistemas basados en Git.
+- Blackboard architectures;
+- Git-based systems.
 
-El interés de Warp no está en reclamar una primitiva inédita.
+Warp's interest isn't in claiming a novel primitive.
 
-Está en la **síntesis** aplicada a un problema concreto de colaboración humano–IA y en hacer explícita la separación entre:
+It's in the **synthesis** applied to a concrete human–AI collaboration problem, and in making explicit the separation between:
 
 ```text
-responsabilidad
-conocimiento
-autoridad
-agente
-historia
+responsibility
+knowledge
+authority
+agent
+history
 ```
 
-Construir la arquitectura fue también un instrumento de investigación: permitió entender desde dentro las decisiones antes de compararlas con modelos existentes.
+Building the architecture was also a research instrument: it made it possible to understand the decisions from the inside before comparing them against existing models.
 
 ---
 
-## 13. Estado
+## 13. Status
 
-Warp se publica como una metodología pequeña y legible, no como una plataforma.
+Warp is published as a small, readable methodology, not as a platform.
 
-El core incluye:
+The core includes:
 
-- arquitectura;
-- reglas operativas;
-- bootstrap de agentes;
-- contexto mínimo;
-- reglas Git;
-- plantillas;
-- índices;
-- comprobador de coherencia;
-- ejemplo mínimo.
+- architecture;
+- operating rules;
+- agent bootstrap;
+- minimal context;
+- Git rules;
+- templates;
+- indexes;
+- coherence checker;
+- minimal example.
 
-Las líneas futuras quedan fuera del core actual:
+Future directions are outside the current core:
 
-- CI automático del checker;
-- avisos de dependencias;
-- consulta semántica del corpus;
-- posible proyección en grafo;
-- experimentación con múltiples usuarios y roles.
+- automated CI for the checker;
+- dependency warnings;
+- semantic corpus querying;
+- possible graph projection;
+- experimentation with multiple users and roles.
 
 ---
 
-## 14. Estructura del repositorio
+## 14. Repository structure
 
 ```text
 .
@@ -558,20 +560,20 @@ Las líneas futuras quedan fuera del core actual:
     └── check_knowledge.py
 ```
 
-`docs/evaluaciones/` recoge informes de evaluación y propuestas de evolución que todavía no forman parte del core canónico: no son metodología vigente, son análisis y disparadores para decisiones futuras.
+`docs/evaluaciones/` collects evaluation reports and evolution proposals that aren't yet part of the canonical core: they aren't current methodology, they're analysis and triggers for future decisions.
 
 ---
 
-## 15. Licencia
+## 15. License
 
-Warp se distribuye bajo licencia dual: el código (`scripts/`) bajo **MIT**, y la documentación y metodología (`docs/`, `README.md`) bajo **CC BY-SA 4.0**.
+Warp is distributed under a dual license: code (`scripts/`) under **MIT**, and documentation and methodology (`docs/`, `README.md`) under **CC BY-SA 4.0**.
 
-Consulta [`LICENSE`](LICENSE), [`LICENSE-CODE`](LICENSE-CODE) y [`LICENSE-DOCS`](LICENSE-DOCS).
+See [`LICENSE`](LICENSE), [`LICENSE-CODE`](LICENSE-CODE), and [`LICENSE-DOCS`](LICENSE-DOCS).
 
 ---
 
-## Autor
+## Author
 
 **Ginés López Montalbán**
 
-Product Design / UX-UI · Frontend · Design Systems · procesos y colaboración con agentes de IA
+Product Design / UX-UI · Frontend · Design Systems · AI-agent processes and collaboration
