@@ -576,4 +576,6 @@ Consulta [`LICENSE`](LICENSE), [`LICENSE-CODE`](LICENSE-CODE) y [`LICENSE-DOCS`]
 
 **Ginés López Montalbán**
 
-Product Design / UX-UI · Frontend · Design Systems · procesos y colaboración con agentes de IA
+Design Engineer · Product Design / UX-UI · Frontend · Design Systems · procesos y colaboración con agentes de IA
+
+[Perfil online](https://www.dsigncloud.es/dosier/es/)
