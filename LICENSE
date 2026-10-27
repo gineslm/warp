@@ -9,7 +9,7 @@ Este repositorio utiliza una licencia dual según el tipo de contenido.
 El código fuente, scripts y otros archivos ejecutables o programáticos se
 distribuyen bajo la MIT License.
 
-Ámbito previsto: `warp/scripts/`, `tests/` y cualquier archivo de código, script o utilidad programática presente o futura.
+Ámbito previsto: `warp/scripts/`, `tests/`, `tools/` y cualquier archivo de código, script o utilidad programática presente o futura.
 
 Consulta [`LICENSE-CODE`](LICENSE-CODE) para el texto completo de la MIT License.
 

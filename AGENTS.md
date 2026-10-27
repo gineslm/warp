@@ -9,7 +9,8 @@ Las instrucciones para agentes de un proyecto que usa Warp son otras: las define
 - `warp/core/` — el método, lo que se instala en cada proyecto.
 - `warp/scripts/` — herramientas.
 - `examples/minimal/` — instancia de ejemplo y corpus de prueba.
-- `tests/` — pruebas del checker.
+- `tests/` — pruebas del checker, del instalador y del paquete.
+- `tools/` — herramientas de la distribución (no se instalan): `build_package.py` genera el paquete descargable.
 - `docs/evaluaciones/` — evaluaciones y propuestas; no son metodología vigente.
 
 ## Cómo se trabaja
@@ -23,8 +24,19 @@ Las instrucciones para agentes de un proyecto que usa Warp son otras: las define
    - `python warp/scripts/check_knowledge.py examples/minimal`
    - `python tests/test_check_knowledge.py`
    - `python tests/test_warp_init.py`
+   - `python tests/test_build_package.py` (desde un árbol sin cambios pendientes en `warp/`)
 7. Integra solo con merge commit (`gh pr merge <n> --merge`); la persona confirma en el terminal. Nunca squash, rebase ni force-push.
 8. Después del merge: `main` actualizado y la rama local borrada.
+
+## Publicar una versión
+
+Cuando `main` acumula un conjunto coherente de cambios en el método, y solo si la persona lo decide:
+
+1. Sube `warp/VERSION` en su propio PR, según el esquema de `warp/core/THREAD_ARCHITECTURE.md` §16.2 (MAJOR si las instancias deben migrar), y ajusta el `warp_version` del ejemplo.
+2. Tras el merge, con `main` actualizado: `python tools/build_package.py`.
+3. Enseña las notas de la versión y espera confirmación.
+4. Etiqueta anotada sobre el merge: `git tag -a vX.Y.Z <sha> -F <notas>` y `git push origin vX.Y.Z`.
+5. Release con el paquete adjunto: `gh release create vX.Y.Z dist/warp-X.Y.Z.zip --title "Warp X.Y.Z" --notes-file <notas>`.
 
 ## Qué no se hace
 

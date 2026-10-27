@@ -575,7 +575,11 @@ Las líneas futuras quedan fuera del core actual:
 │
 ├── tests/
 │   ├── test_check_knowledge.py
-│   └── test_warp_init.py
+│   ├── test_warp_init.py
+│   └── test_build_package.py
+│
+├── tools/
+│   └── build_package.py
 │
 └── docs/
     └── evaluaciones/
@@ -589,7 +593,7 @@ Para instalar Warp en un proyecto, sigue [`INSTALL.md`](INSTALL.md).
 
 ## 15. Licencia
 
-Warp se distribuye bajo licencia dual: el código (`warp/scripts/`, `tests/`) bajo **MIT**, y la documentación y metodología (`warp/core/`, `examples/`, `docs/`, `README.md`) bajo **CC BY-SA 4.0**.
+Warp se distribuye bajo licencia dual: el código (`warp/scripts/`, `tests/`, `tools/`) bajo **MIT**, y la documentación y metodología (`warp/core/`, `examples/`, `docs/`, `README.md`) bajo **CC BY-SA 4.0**.
 
 Consulta [`LICENSE`](LICENSE), [`LICENSE-CODE`](LICENSE-CODE) y [`LICENSE-DOCS`](LICENSE-DOCS).
 
