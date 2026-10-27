@@ -391,22 +391,65 @@ def cmd_init(args):
     return code
 
 
+def require_gh():
+    if not shutil.which("gh"): fail("hace falta GitHub CLI (gh) para crear el repositorio.")
+    if run(["gh", "auth", "status"], check=False)[0] != 0:
+        fail("gh no tiene sesión iniciada: ejecuta `gh auth login`.")
+
+
+def repository_of(dest):
+    """`propietario/nombre` declarado en warp.yaml."""
+    m = re.search(r"^\s+repository:\s*(\S+)", read(os.path.join(dest, "warp.yaml")), re.M)
+    slug = m.group(1) if m else ""
+    owner, _, repo = slug.partition("/")
+    if not GITHUB_NAME.fullmatch(owner) or not REPO_NAME.fullmatch(repo):
+        fail("warp.yaml no declara un project.repository válido (propietario/nombre).")
+    return slug
+
+
+def publish_remote(dest, slug, visibility):
+    code, out = run(["gh", "repo", "view", slug, "--json", "isEmpty", "--jq", ".isEmpty"],
+                    check=False)
+    if code == 0:
+        if out != "true": fail("el repositorio %s ya existe y no está vacío." % slug)
+        print("El repositorio %s ya existe y está vacío: se enlaza." % slug)
+    else:
+        run(["gh", "repo", "create", slug, "--" + visibility])
+        print("Repositorio %s creado (%s)." % (slug, visibility))
+    if run(["git", "remote", "get-url", "origin"], cwd=dest, check=False)[0] != 0:
+        run(["git", "remote", "add", "origin", "https://github.com/%s.git" % slug], cwd=dest)
+    run(["git", "push", "-q", "-u", "origin", "knowledge"], cwd=dest)
+    run(["gh", "api", "-X", "PATCH", "repos/" + slug] + MERGE_SETTINGS + ["--silent"])
+    print("Rama knowledge subida y ajustes aplicados: knowledge como rama principal, "
+          "solo merge commit, mensaje del PR y borrado automático de ramas.")
+    print("\nRecomendado, a mano: proteger knowledge (sin force-push, checks obligatorios). "
+          "En repositorios privados requiere GitHub Pro o Team.")
+
+
 def cmd_publish(args):
     dest = os.path.abspath(args.destino or os.getcwd())
-    state_path = os.path.join(dest, ".git", STATE)
-    if not os.path.isfile(state_path):
-        fail("no hay una instalación pendiente en %s (ejecuta antes `init`)." % dest)
-    state = json.loads(read(state_path))
-    c, message = state["config"], state["message"]
+    if not os.path.isfile(os.path.join(dest, "warp.yaml")):
+        fail("%s no es una instancia de Warp (falta warp.yaml)." % dest)
     code, branch = run(["git", "symbolic-ref", "--short", "HEAD"], cwd=dest, check=False)
     if branch != "knowledge": fail("la rama actual debe ser knowledge (es '%s')." % branch)
-    if c["create_remote"]:
-        if not shutil.which("gh"): fail("hace falta GitHub CLI (gh) para crear el repositorio.")
-        if run(["gh", "auth", "status"], check=False)[0] != 0:
-            fail("gh no tiene sesión iniciada: ejecuta `gh auth login`.")
-
+    state_path = os.path.join(dest, ".git", STATE)
+    pending = os.path.isfile(state_path)
     committed = run(["git", "rev-parse", "--verify", "-q", "HEAD"], cwd=dest, check=False)[0] == 0
-    if not committed:
+    if not pending and not committed:
+        fail("no hay una instalación pendiente en %s (ejecuta antes `init`)." % dest)
+    if not pending and not args.remote:
+        fail("la instancia ya está instalada. Para publicarla en GitHub: "
+             "python warp/scripts/warp.py publish --remote")
+    state = json.loads(read(state_path)) if pending else {}
+    c = state.get("config", {})
+    remote = args.remote or c.get("create_remote", False)
+    if remote:
+        require_gh()
+        if not pending and run(["git", "remote", "get-url", "origin"], cwd=dest,
+                               check=False)[0] == 0:
+            fail("la instancia ya tiene un repositorio remoto (origin).")
+
+    if pending and not committed:
         if not run(["git", "config", "user.email"], cwd=dest, check=False)[1]:
             fail("Git no tiene identidad configurada (git config user.name / user.email).")
         run(["git", "add", "-A"], cwd=dest)
@@ -414,34 +457,19 @@ def cmd_publish(args):
             run(["git", "reset", "-q"], cwd=dest, check=False)
             fail("el checker encontró errores; no se hace el commit.")
         msg_path = os.path.join(dest, ".git", "WARP_INIT_MSG")
-        write(msg_path, message)
+        write(msg_path, state["message"])
         run(["git", "commit", "-q", "-F", msg_path], cwd=dest)
         os.remove(msg_path)
         print("\nCommit inicial creado en knowledge.")
 
-    if c["create_remote"]:
-        slug = "%s/%s" % (c["owner"], c["repo"])
-        code, out = run(["gh", "repo", "view", slug, "--json", "isEmpty", "--jq", ".isEmpty"],
-                        check=False)
-        if code == 0:
-            if out != "true": fail("el repositorio %s ya existe y no está vacío." % slug)
-            print("El repositorio %s ya existe y está vacío: se enlaza." % slug)
-        else:
-            run(["gh", "repo", "create", slug, "--" + c["visibility"]])
-            print("Repositorio %s creado (%s)." % (slug, c["visibility"]))
-        if run(["git", "remote", "get-url", "origin"], cwd=dest, check=False)[0] != 0:
-            run(["git", "remote", "add", "origin", "https://github.com/%s.git" % slug], cwd=dest)
-        run(["git", "push", "-q", "-u", "origin", "knowledge"], cwd=dest)
-        run(["gh", "api", "-X", "PATCH", "repos/" + slug] + MERGE_SETTINGS + ["--silent"])
-        print("Rama knowledge subida y ajustes aplicados: knowledge como rama principal, "
-              "solo merge commit, mensaje del PR y borrado automático de ramas.")
-        print("\nRecomendado, a mano: proteger knowledge (sin force-push, checks obligatorios). "
-              "En repositorios privados requiere GitHub Pro o Team.")
+    if remote:
+        visibility = args.visibility or c.get("visibility") or "private"
+        publish_remote(dest, repository_of(dest), visibility)
     else:
-        print("\nSin repositorio remoto. Para publicarlo más tarde: crea el repositorio, "
-              "`git remote add origin <url>` y `git push -u origin knowledge`.")
-    os.remove(state_path)
-    print("\nInstalación completada.")
+        print("\nSin repositorio remoto. Para publicarlo más tarde, desde la carpeta del "
+              "proyecto: python warp/scripts/warp.py publish --remote")
+    if pending: os.remove(state_path)
+    print("\nListo.")
     return 0
 
 
@@ -455,8 +483,16 @@ def main(argv):
                "por defecto knowledge-only, advisory y private):\n\n" + CONFIG_EXAMPLE)
     p_init.add_argument("destino", nargs="?", help="carpeta del proyecto (por defecto, la actual)")
     p_init.add_argument("--config", help="archivo JSON con los datos de la instalación")
-    p_pub = sub.add_parser("publish", help="hace el commit inicial y, si se pidió, crea el remoto")
-    p_pub.add_argument("destino", nargs="?")
+    p_pub = sub.add_parser(
+        "publish", help="hace el commit inicial y, si se pidió, crea el repositorio en GitHub",
+        description="Tras init: hace el commit inicial confirmado y, si se pidió, crea el "
+                    "repositorio. Con --remote, publica en GitHub una instancia ya instalada "
+                    "sin repositorio, usando el project.repository de warp.yaml.")
+    p_pub.add_argument("destino", nargs="?", help="carpeta del proyecto (por defecto, la actual)")
+    p_pub.add_argument("--remote", action="store_true",
+                       help="crea (o enlaza, si está vacío) el repositorio en GitHub y sube knowledge")
+    p_pub.add_argument("--visibility", choices=VISIBILITY,
+                       help="visibilidad del repositorio nuevo (por defecto, private)")
     args = parser.parse_args(argv[1:])
     return cmd_init(args) if args.command == "init" else cmd_publish(args)
 

@@ -121,6 +121,31 @@ class WarpInit(unittest.TestCase):
         self.assertFalse(os.path.exists(os.path.join(self.dest, ".git", "warp-init.json")))
         self.assertEqual(self.check()[0], 0)
 
+    def test_publish_dos_veces_indica_publish_remote(self):
+        self.assertEqual(self.init()[0], 0)
+        self.assertEqual(self.run_cmd(self.warp, "publish")[0], 0)
+        code, out = self.run_cmd(self.warp, "publish")
+        self.assertEqual(code, 1, out)
+        self.assertIn("publish --remote", out)
+
+    def test_publish_sin_instalacion(self):
+        code, out = self.run_cmd(self.warp, "publish")
+        self.assertEqual(code, 1, out)
+        self.assertIn("falta warp.yaml", out)
+
+    def test_publish_remote_con_origin_ya_configurado(self):
+        self.assertEqual(self.init()[0], 0)
+        self.assertEqual(self.run_cmd(self.warp, "publish")[0], 0)
+        self.git("remote", "add", "origin", "https://example.invalid/x.git")
+        code, out = self.run_cmd(self.warp, "publish", "--remote")
+        self.assertEqual(code, 1, out)
+        if shutil.which("gh") and "sesión" not in out:
+            self.assertIn("ya tiene un repositorio remoto", out)
+
+    def test_publish_visibilidad_no_valida(self):
+        code, out = self.run_cmd(self.warp, "publish", "--remote", "--visibility", "interna")
+        self.assertEqual(code, 2, out)
+
     def test_carpeta_con_otros_archivos(self):
         open(os.path.join(self.dest, "algo.txt"), "w").close()
         code, out = self.init()

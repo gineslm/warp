@@ -32,7 +32,7 @@ Las instrucciones para agentes de un proyecto que usa Warp son otras: las define
 
 Cuando `main` acumula un conjunto coherente de cambios en el método, y solo si la persona lo decide:
 
-1. Sube `warp/VERSION` en su propio PR, según el esquema de `warp/core/THREAD_ARCHITECTURE.md` §16.2 (MAJOR si las instancias deben migrar), y ajusta el `warp_version` del ejemplo.
+1. Sube `warp/VERSION` en su propio PR, según el esquema de `warp/core/THREAD_ARCHITECTURE.md` §16.2 (MAJOR si las instancias deben migrar), y ajusta el `warp_version` del ejemplo y el enlace de descarga directa de `INSTALL.md` §2.
 2. Tras el merge, con `main` actualizado: `python tools/build_package.py`.
 3. Enseña las notas de la versión y espera confirmación.
 4. Etiqueta anotada sobre el merge: `git tag -a vX.Y.Z <sha> -F <notas>` y `git push origin vX.Y.Z`.

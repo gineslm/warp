@@ -172,8 +172,8 @@ class CheckKnowledge(unittest.TestCase):
         self.assert_error("layout 'mixto' no válido")
 
     def test_warp_version_distinta_de_la_del_metodo(self):
-        self.replace("warp.yaml", "warp_version: 4.0.0", "warp_version: 2.9.0")
-        self.assert_error("warp_version '2.9.0' no coincide con warp/VERSION '4.0.0'")
+        self.replace("warp.yaml", "warp_version: 4.1.0", "warp_version: 2.9.0")
+        self.assert_error("warp_version '2.9.0' no coincide con warp/VERSION '4.1.0'")
 
     def test_warp_yaml_sin_campo_de_proyecto(self):
         self.replace("warp.yaml", "  repository: ejemplo/warp-minimal\n", "")
