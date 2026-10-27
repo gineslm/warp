@@ -24,8 +24,10 @@ mi-proyecto/
 ## 2. Descargar el método
 
 1. Crea una carpeta vacía para el proyecto, por ejemplo `mi-proyecto`.
-2. Descarga el paquete de la última versión, `warp-<versión>.zip`, desde la página de [versiones de Warp](https://github.com/gineslm/warp/releases/latest).
-3. Descomprímelo dentro de `mi-proyecto`. Debe quedar `mi-proyecto/warp/` y nada más.
+2. Descarga el paquete de la versión actual: **[warp-4.1.0.zip](https://github.com/gineslm/warp/releases/download/v4.1.0/warp-4.1.0.zip)**. También está en la página de [versiones de Warp](https://github.com/gineslm/warp/releases/latest), en la sección *Assets*.
+3. Descomprímelo dentro de `mi-proyecto`. Debe quedar `mi-proyecto/warp/` y nada más, con unos 16 archivos dentro.
+
+> **No descargues los archivos «Source code (zip)» ni «Source code (tar.gz)»** que GitHub añade a cada versión: son el repositorio completo de la distribución, no el paquete. Si al descomprimir aparecen `README.md`, `docs/` o `examples/`, has descargado el archivo equivocado.
 
 Con GitHub CLI, desde la carpeta del proyecto:
 
@@ -122,7 +124,13 @@ python warp/scripts/warp.py publish
 2. si se pidió, crea el repositorio en GitHub (o enlaza uno existente y vacío) y sube `knowledge`;
 3. aplica los ajustes de integración: `knowledge` como rama principal, solo merge commit, mensaje del merge igual al título y la descripción del PR, y borrado automático de las ramas fusionadas.
 
-Si no se pidió repositorio remoto, el commit queda en local y puedes publicarlo más tarde.
+Si no se pidió repositorio remoto, el commit queda en local. Para publicarlo más tarde en GitHub, con el `project.repository` de `warp.yaml`:
+
+```bash
+python warp/scripts/warp.py publish --remote
+```
+
+Crea el repositorio (privado salvo `--visibility public`), sube `knowledge` y aplica los mismos ajustes de integración.
 
 **Recomendado, a mano:** proteger `knowledge` en GitHub (*Settings → Branches*): sin force-push y, cuando haya CI, con checks obligatorios. En repositorios privados, la protección de ramas requiere GitHub Pro o Team.
 
