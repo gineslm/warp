@@ -323,6 +323,21 @@ Decisiones tomadas al discutir esta evaluación. Detalle en `PROPUESTA_CAPA_INST
 
 ---
 
+## 8c. Verificaciones externas (fase 1)
+
+Hechas el 2026-10-27 en la documentación oficial de GitHub. Sustituyen a lo marcado como «conocimiento previo, verificar en la fase 1» en 4.3, 4.11 y §6.
+
+| Punto | Resultado | Consecuencia |
+|---|---|---|
+| ¿El autor de un PR puede aprobarlo? (4.11) | **No.** «Pull request authors cannot approve their own pull requests». La documentación no describe el caso del propietario único de CODEOWNERS, pero se deduce que, si se exige su revisión, el PR queda bloqueado. | Se mantiene la regla revisada en §8b: no exigir revisión cuando el autor es el `owner` y comprobarlo con CI propia. |
+| ¿El mensaje se puede editar en el diálogo de merge? (4.3) | **Sí.** «Type a commit message, or accept the default message». | La comprobación posterior al merge (capa 5) es necesaria para los merges hechos desde la web. Desde Claude Code, `gh pr merge` usa el mensaje configurado y el aviso de confirmación muestra el comando. |
+| Protección de ramas en repos privados (§6) | Con **GitHub Free** solo en repos públicos. Con **Pro** (cuenta personal) o **Team** (organización), los repos privados tienen protección de ramas, revisores obligatorios y CODEOWNERS. Los *rulesets* son de Team y Enterprise. | En un repo privado gratuito, GitHub no impide force-push ni exige checks en `knowledge`: quedan en las reglas de Claude Code y en la convención. Los ajustes del repo (solo merge commit, mensaje del PR, borrado automático de ramas) funcionan en cualquier plan. La subfase 4a (`advisory`) funciona con cualquier plan; la 4b (`strict` con CI obligatoria) requiere Pro, Team o un repo público. |
+| Limitar el método de merge solo a `knowledge` (§8b) | **Pendiente, condicionado.** Solo afecta a `layout: with-code`. | Se verifica cuando exista la primera instancia con código. |
+
+Fuentes: [ramas protegidas y rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets), [aprobación con revisiones obligatorias](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/approving-a-pull-request-with-required-reviews), [merge de un PR](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/merging-a-pull-request), [planes de GitHub](https://docs.github.com/en/get-started/learning-about-github/githubs-plans).
+
+---
+
 ## 9. Fuentes
 
 - Claude Code, memoria y `AGENTS.md`: https://code.claude.com/docs/en/memory (consultado 2026-10-27).
