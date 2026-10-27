@@ -1,0 +1,282 @@
+# Propuesta — Capa de instalación de Warp
+
+**Fecha:** 2026-10-27
+**Estado:** propuesta. Fuera del core; no es metodología vigente. Se promueve a `warp/core/` y a la raíz cuando se construya.
+**Origen:** decisiones tomadas al evaluar `EVALUACION_2026-10-27.md` (§4.20 y revisiones posteriores).
+
+---
+
+## 1. Decisiones adoptadas
+
+| Decisión | Consecuencia |
+|---|---|
+| El repo `warp` es la **distribución** del método, no una instancia gobernada por hilos. | El core se gobierna con el proceso normal del repo: PRs y versiones. `docs/evaluaciones/` es documentación del proyecto `warp` y no necesita hilo. |
+| Las mejoras al método llegan a `warp` **por PR**. | Una instancia que detecte una mejora abre un issue o un PR en `warp`. El HANDOFF sigue siendo solo intra-proyecto. |
+| El **piloto es una instancia nueva** creada con el instalador. | El instalador es lo primero que prueba el piloto. |
+| Instalador: **script de Python con solo la biblioteca estándar**, que también actualiza. | Coherente con `check_knowledge.py`. |
+| En la instancia, todo Warp vive bajo **un espacio de nombres `warp/`**. | No choca con el `docs/` y el `scripts/` del software, que la arquitectura prevé en el mismo repo (§3). |
+| El conocimiento vive en **`warp/corpus/`**, separado de los hilos. | Transferir autoridad no mueve archivos. `warp/threads/` solo guarda artefactos operativos. |
+| El ejemplo pasa a ser **una instancia completa** en `examples/minimal/`. | El checker solo tiene que entender instancias, y el ejemplo sirve de corpus de prueba. |
+| La configuración del proyecto vive en **`warp.yaml`, en la raíz**, y las personas en **`warp/USERS.md`**. | Ambos son documentos gobernados por el hilo `governance`. |
+| Existe un **hilo de gobierno** con identificador reservado `governance`, creado por el instalador. | Tiene autoridad sobre toda la configuración del proyecto. Ver §4. |
+| **Autoridad flexible:** cualquier usuario activo trabaja en cualquier hilo; integrar exige ser el `owner` o tener su aprobación. Rigidez configurable con `enforcement`. | Revisa D2 y 4.11 de la auditoría. Ver §5. |
+| Las instrucciones de uso van en **`INSTALL.md`, en la raíz** de `warp`, enlazado desde el README. | Ver §10. |
+
+---
+
+## 2. Dos capas
+
+| | Distribución (`warp`) | Instancia (proyecto) |
+|---|---|---|
+| Qué es | el método: reglas, plantillas, herramientas | el conocimiento de un proyecto |
+| Quién la evoluciona | quien mantiene `warp`, por PR | los hilos del proyecto, según el core |
+| Versionado | versiones publicadas del método | decisiones (un commit = una decisión) |
+
+En una instancia hay tres categorías de archivo:
+
+1. **Capa de sistema** (`warp/core/`, `warp/scripts/`): viene de `warp`, es de solo lectura y ningún hilo tiene autoridad sobre ella. Se cambia solo actualizando de versión.
+2. **Derivados** (`warp.lock`, `warp/index/`): se regeneran y nunca se editan a mano. Ningún hilo tiene autoridad sobre ellos.
+3. **Capa del proyecto**: todo lo demás. Cada archivo tiene exactamente un hilo con autoridad.
+
+---
+
+## 3. Estructura de carpetas
+
+### Instancia
+
+```text
+instancia/
+├── warp.yaml              configuración del proyecto         → governance
+├── warp.lock              huellas de la capa de sistema      (derivado)
+├── AGENTS.md              remite al contexto mínimo          → governance
+├── .claude/settings.json  autoMemoryEnabled: false           → governance
+├── .github/workflows/     CI (opcional)                      → governance
+└── warp/
+    ├── core/              método                             (sistema)
+    ├── scripts/           checker, instalador                (sistema)
+    ├── index/             THREAD_INDEX.md, DOCUMENT_INDEX.md (derivado)
+    ├── threads/
+    │   ├── governance/    MANIFEST.md + handoff/
+    │   └── <thread_id>/   MANIFEST.md + handoff/
+    ├── corpus/            conocimiento, organizado por tema  → según DOCUMENT_INDEX
+    └── USERS.md           participantes                      → governance
+```
+
+- **`warp/corpus/`** se organiza por tema, nunca por hilo. La autoridad de cada documento la declara el MANIFEST de su hilo y la muestra el `DOCUMENT_INDEX`, no la ruta.
+- **`warp/threads/<id>/handoff/`** es el buzón por entradas: un archivo por entrada (evaluación, 4.4).
+- **`warp/index/`** también acogerá el futuro grafo derivado (opción 1 de `INFORME_FASE2_GRAFO.md`).
+
+### Distribución
+
+```text
+warp/  (repo)
+├── README.md, README.es.md, INSTALL.md
+├── LICENSE, LICENSE-CODE, LICENSE-DOCS
+├── warp/
+│   ├── core/              ← lo que se instala
+│   └── scripts/           ← lo que se instala
+├── examples/
+│   └── minimal/           instancia completa de ejemplo y corpus de prueba
+└── docs/
+    └── evaluaciones/      documentación del proyecto warp (no se instala)
+```
+
+`examples/minimal/` tiene su propio `warp.yaml`, `warp/USERS.md` (con usuarios ficticios), el hilo `governance`, el hilo `example-notes` y el corpus correspondiente. La CI de `warp` ejecuta el checker sobre él. Podrá crecer con más hilos y entradas cruzadas hasta reproducir los escenarios 7.2–7.6 de la auditoría.
+
+---
+
+## 4. El hilo `governance`
+
+**Responsabilidad:** la configuración del sistema Warp en este proyecto y sus participantes. No gobierna el contenido del corpus: los temas transversales del conocimiento tienen sus propios hilos gestores (`THREAD_ARCHITECTURE.md` §11.3).
+
+**Autoridad documental:** `warp.yaml`, `warp/USERS.md`, `AGENTS.md`, `.claude/settings.json` y los workflows de CI.
+
+**No es un «tipo» de hilo.** La arquitectura deja la taxonomía de tipos como cuestión abierta (§11.3, §17), y esta propuesta no la formaliza. `governance` es un hilo corriente con un identificador reservado y tres invariantes en el checker:
+
+1. existe exactamente un hilo `governance`;
+2. tiene autoridad sobre los archivos de la lista anterior;
+3. no puede estar `CLOSED` ni `ARCHIVED`.
+
+**Último recurso, fuera del modelo:** si el `owner` de `governance` desaparece, nadie dentro de Warp puede reasignarlo. La salida es la administración del repo en GitHub. Se documenta como límite explícito, sin inventar un mecanismo adicional.
+
+---
+
+## 5. Modelo de autoridad
+
+### 5.1 Separar conectar, trabajar y decidir
+
+| Acción | Quién |
+|---|---|
+| Leer el corpus y conectar un agente a cualquier hilo | cualquiera |
+| Trabajar en una rama de un hilo (`agent/<hilo>/<tarea>`) | cualquier usuario `active` de `USERS.md` |
+| Registrar una entrada en el buzón de otro hilo | cualquiera (regla vigente, `THREAD_ARCHITECTURE.md` §7.2) |
+| Integrar en `knowledge` cambios sobre documentos de un hilo | su `owner`, o cualquiera con **aprobación del `owner`** en el PR |
+| Cambiar el `owner` de un hilo | el `owner` actual, o el `owner` de `governance` |
+
+- Hay **un responsable por hilo**, que es quien da por buena cada decisión, y **muchos contribuidores posibles**. No hace falta una lista de miembros por hilo.
+- El usuario de GitHub sirve para **identificar**, no para controlar el acceso. Quién puede subir ramas lo deciden los permisos del repo. Warp actúa solo al integrar.
+- Que dos personas no resuelvan la misma petición lo garantiza «una rama activa por tarea» (auditoría, 4.12), no restringir quién trabaja.
+- Se mantiene la **autoridad única por documento** entre hilos. Es el núcleo del diseño, y su vía flexible ya existe: proponer en el buzón del otro hilo.
+
+### 5.2 `enforcement`
+
+Parámetro de `warp.yaml`, gobernado por `governance`:
+
+- **`advisory`**: las comprobaciones de **quién** («no eres el `owner` y falta su aprobación», «el `owner` no es un usuario activo») son avisos;
+- **`strict`**: son errores y requisito de merge en la CI.
+
+Las **invariantes estructurales** (MANIFEST, índices, buzones, capa de sistema) son siempre errores, sea cual sea el valor. `enforcement` solo regula la autoridad sobre personas.
+
+Uso previsto: `advisory` para proyectos de una persona y en la subfase 4a del piloto; `strict` en la 4b, con CI. Que la rigidez haga falta se decide con datos.
+
+---
+
+## 6. `warp.yaml`
+
+```yaml
+warp_version: 2.2.0          # versión del método instalada
+project:
+  name: Portal de autoservicio
+  repository: mi-org/portal-autoservicio
+  language: es-ES
+enforcement: advisory        # advisory | strict
+```
+
+- La rama de conocimiento queda **fija como `knowledge`**: forma parte del método y no es configurable.
+- **`warp.lock`** (derivado) registra la versión instalada y una huella SHA-256 de cada archivo de `warp/core/` y `warp/scripts/`.
+
+---
+
+## 7. `warp/USERS.md`
+
+~~~markdown
+# Participantes
+
+```yaml
+users:
+  - github: usuario-ux
+    name: Responsable de UX
+    status: active
+  - github: usuario-ing
+    name: Responsable de ingeniería
+    status: active
+```
+
+(prosa libre: notas sobre el equipo, criterios de alta…)
+~~~
+
+- **`status: active | inactive`** desde el principio. Si alguien se va, se marca `inactive`, no se borra. Así los MANIFEST de los hilos cerrados que tenía siguen siendo válidos, y el checker puede exigir que el `owner` de un hilo **activo** sea un usuario activo.
+- **Sin campo `roles` todavía.** Mismo principio que `THREAD_INDEX_TEMPLATE.md` §2.8: no se incorporan campos que la arquitectura no haya definido. El formato permite añadirlo cuando se diseñe el sistema de roles.
+- **Sin emails ni otros datos personales.** Git conserva para siempre todo lo que pasa por él (mismo argumento que `GIT_COMMIT_RULES.md` §1).
+- **Dar de alta a una persona** es una operación Warp normal: una entrada en el buzón de `governance`, o un cambio directo de su `owner`.
+
+---
+
+## 8. El instalador (`warp/scripts/warp.py`)
+
+### `init <destino>`
+
+1. Comprueba que el destino es un directorio vacío o un repo Git sin capa Warp.
+2. Pide o lee (`--config`):
+   - los datos de `warp.yaml`;
+   - la **lista inicial de usuarios** (como mínimo uno);
+   - quién de ellos es el `owner` de `governance`.
+3. Copia la capa de sistema y escribe `warp.lock`.
+4. Genera:
+   - `warp.yaml` y `warp/USERS.md`;
+   - el hilo `governance` (MANIFEST y buzón vacío, `origin: USER_DECLARED`, autoridad sobre su lista de §4);
+   - los índices desde las plantillas;
+   - `AGENTS.md` y `.claude/settings.json`;
+   - la CI, solo con `--ci`.
+5. Crea la rama `knowledge`.
+6. Ejecuta el checker.
+7. **No hace commit.** Muestra el mensaje propuesto, del tipo `chore(warp): adoptar Warp 2.2.0`, con su «Por qué:», para que la persona lo confirme.
+8. **No toca el remoto.** Imprime la protección recomendada para `knowledge`: sin force-push, checks requeridos, squash como único método y mensaje «PR title and description». La persona la aplica.
+
+### `upgrade --from <ruta a un clon de warp>`
+
+1. Comprueba que la capa de sistema coincide con `warp.lock`. Si alguien la editó, se detiene y lo indica.
+2. Reemplaza la capa de sistema y actualiza `warp.lock` y `warp_version`. Cambiar `warp_version` modifica `warp.yaml`, así que es una decisión del hilo `governance`.
+3. Si la versión nueva cambia el esquema de MANIFEST, buzón, índices o `USERS.md`, lo informa. No migra el conocimiento por su cuenta.
+4. Ejecuta el checker y muestra el mensaje propuesto. Sin commit.
+
+Sin red: la persona trae la versión nueva con `git clone` o `git fetch`. Así el script no maneja credenciales.
+
+---
+
+## 9. Cambios que exige en el core y en el checker
+
+### 9.1 Rutas (en `warp`)
+
+| Hoy | Pasa a |
+|---|---|
+| `docs/core/*.md` (salvo índices) | `warp/core/*.md` |
+| `docs/core/THREAD_INDEX.md`, `DOCUMENT_INDEX.md` | `examples/minimal/warp/index/` (en `warp/core/` quedan solo las plantillas) |
+| `scripts/check_knowledge.py` | `warp/scripts/check_knowledge.py` |
+| `docs/threads/example/MANIFEST.md`, `HANDOFF.md` | `examples/minimal/warp/threads/example-notes/` (buzón como `handoff/`) |
+| `docs/threads/example/NOTES.md` | `examples/minimal/warp/corpus/NOTES.md` |
+| `docs/evaluaciones/` | sin cambio |
+
+Hay que actualizar todas las rutas `docs/core/…` del core y del README. Aparecen en los seis documentos del core y en las dos plantillas.
+
+### 9.2 Contenido del core
+
+1. **`THREAD_ARCHITECTURE.md`:**
+   - §16 se reescribe con la estructura de §3, las tres categorías de archivo (§2) y el hilo `governance` (§4);
+   - §17 retira «organización física futura del corpus», que queda resuelta;
+   - §4.1 define `owner` como un `github` de `USERS.md`;
+   - una sección nueva recoge el modelo de autoridad de §5.
+2. **Datos de proyecto fuera del core:**
+   - se quita la línea `**Repositorio:** tu-organización/tu-repositorio` de las cabeceras de los siete documentos que la llevan;
+   - los bloques compactos (`PROJECT_AGENT_CONTEXT.md:126`, `THREAD_CONTEXT_BOOTSTRAP.md:191`) remiten a `warp.yaml`.
+3. **Plantillas nuevas en `warp/core/`:** el instalador necesita formas canónicas que hoy no existen. Solo hay un MANIFEST de ejemplo, no una plantilla. Hacen falta `MANIFEST_TEMPLATE.md`, `HANDOFF_ENTRY_TEMPLATE.md` (formato `yaml`, evaluación 4.14) y `USERS_TEMPLATE.md`.
+4. **`PROJECT_AGENT_CONTEXT.md` §2:** añadir la regla dura de estado fuera del repo (evaluación, 4.5) y el modelo de autoridad en una línea.
+
+### 9.3 Checker
+
+1. **Raíz:** se reconoce por `warp.yaml` más `warp/core/THREAD_ARCHITECTURE.md`, no por `docs/core/…` (`check_knowledge.py:61-69`).
+2. **Hilos:** se buscan solo en `warp/threads/*/`, no en cualquier `MANIFEST.md` bajo `docs/` (`:117-122`).
+3. **Índices** en `warp/index/` (`:190`, `:222`).
+4. **Rutas de autoridad:** aceptar cualquier ruta, incluidas `warp.yaml` y `AGENTS.md` en la raíz. Hoy exige `/` o `.md` (`:130-131`).
+5. **Invariantes nuevas:**
+   - `warp.yaml` válido;
+   - la capa de sistema coincide con `warp.lock`;
+   - `USERS.md` válido;
+   - el `owner` de cada MANIFEST es un `github` de `USERS.md`, y si el hilo está activo, de un usuario `active` (según `enforcement`);
+   - las tres invariantes de `governance` (§4).
+6. Las correcciones de la fase 0b (evaluación, 4.15–4.17) se hacen antes y por separado.
+
+---
+
+## 10. Documentación de uso
+
+- **`INSTALL.md`, en la raíz de `warp`**, enlazado desde `README.md` y `README.es.md`. El README presenta el método a quien quizá nunca lo instale; las instrucciones cambian con cada versión del instalador; y `INSTALL.md` no se copia a las instancias.
+- **Cuándo:** en el **mismo PR que el instalador**, porque es la misma decisión. Mientras tanto el README no cambia.
+- **Idioma:** español, como el resto de la documentación, con un resumen de uso en inglés dentro de `README.md`.
+- **Contenido mínimo:**
+  - requisitos: Git y Python 3.x;
+  - `init`, con un ejemplo de `warp.yaml` y de la lista de usuarios;
+  - la protección de `knowledge`;
+  - `enforcement`;
+  - el primer hilo, remitiendo al core;
+  - `upgrade`;
+  - cómo proponer mejoras a `warp`.
+- **README:** en ese mismo PR se actualizan el §13 (estado) y el §14 (estructura).
+
+---
+
+## 11. Cuestiones abiertas
+
+1. **`repository.knowledge_branch` en el MANIFEST:** con `knowledge` fijo, el campo sobra. ¿Se retira o se deja verificando que vale `knowledge`?
+2. **Versión del conjunto:** hoy cada documento del core tiene su propia versión. Falta la versión del método, como etiqueta de release en `warp`, que es la que registra `warp_version`.
+3. **¿La CI va incluida por defecto en `init`?**
+4. **Aprobación del `owner` en `strict`:** comprobarla exige consultar la API de GitHub desde la CI. Hay que verificar en la fase 1 qué permite el plan para repos privados.
+
+---
+
+## 12. Encaje en la hoja de ruta
+
+- **Fase 0b** (correcciones del checker y memoria): PR a `warp` sobre la estructura actual. Es el primer uso del flujo «mejoras por PR».
+- **Fase 2:** se añade la reestructuración de §9.1–§9.2. Va **antes** de los demás cambios del core, para no escribirlos dos veces sobre rutas que van a cambiar. Las plantillas nuevas (§9.2.3) se integran con el buzón por entradas (evaluación, 4.4).
+- **Fase 3:** se añaden el checker de §9.3 y el instalador (`init`, `upgrade`). El instalador va antes de la CI, porque la CI la instala `init --ci`.
+- **Fase 4a:** el piloto empieza con `warp.py init` en un repo nuevo, con `enforcement: advisory`. **4b:** `strict` con CI.

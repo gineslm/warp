@@ -8,3 +8,5 @@ Un informe de aquí se promueve a `docs/core/` únicamente cuando se decide cons
 
 - [`INFORME_VIABILIDAD.md`](INFORME_VIABILIDAD.md) — barrido honesto de riesgos de diseño del modelo Warp (coste, recuperación, concurrencia, fiabilidad del agente…), con lo que es empírico marcado como tal.
 - [`INFORME_FASE2_GRAFO.md`](INFORME_FASE2_GRAFO.md) — opciones para una futura capa de consulta/grafo sobre el corpus, y los disparadores empíricos que decidirían construirla.
+- [`EVALUACION_2026-10-27.md`](EVALUACION_2026-10-27.md) — evaluación de la auditoría de integración con agentes: hallazgos verificados, pruebas del checker, escenarios y hoja de ruta.
+- [`PROPUESTA_CAPA_INSTALACION.md`](PROPUESTA_CAPA_INSTALACION.md) — `warp` como distribución instalable: estructura `warp/`, `warp.yaml`, `USERS.md`, hilo `governance`, modelo de autoridad e instalador/actualizador.
