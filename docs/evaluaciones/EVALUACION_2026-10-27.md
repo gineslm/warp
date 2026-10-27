@@ -318,6 +318,7 @@ Decisiones tomadas al discutir esta evaluación. Detalle en `PROPUESTA_CAPA_INST
   - **los secretos se revisan en cada commit del PR**, no solo en el estado final, porque todo commit de la rama queda para siempre en `knowledge`;
   - **regla de criterio nueva:** lo que no puede quedar para siempre no se escribe en el repo, ni siquiera en un borrador (datos personales, información confidencial de clientes o contratos). Ningún checker lo detecta; va junto a la regla dura de secretos en `PROJECT_AGENT_CONTEXT.md` §2;
   - **queda sin efecto** la integración por squash propuesta en 4.3 (corrección 2) y 4.6 (paso 4).
+- **`knowledge` como rama con árbol propio, independiente del código.** Si conocimiento y software compartieran árbol, el `AGENTS.md` de Warp, la memoria desactivada y el merge commit obligatorio afectarían también a los desarrolladores. Con árbol propio, como sugiere `THREAD_ARCHITECTURE.md` §3, se aplican solo a `knowledge`, y el código consulta el corpus con total libertad: leer no exige conectarse a ningún hilo. El instalador solo crea `knowledge`. Con `layout: knowledge-only`, `knowledge` es la rama principal y no existe `main`; con `with-code`, las ramas del software son del equipo que lo desarrolla. Pendiente para la fase 1: verificar que GitHub permite limitar el método de merge solo a `knowledge`.
 - **Gobierno del proyecto:** un hilo con identificador reservado `governance` tiene autoridad sobre `warp.yaml`, `warp/USERS.md`, `AGENTS.md`, `.claude/settings.json` y la CI de cada instancia.
 
 ---

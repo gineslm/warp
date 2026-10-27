@@ -14,7 +14,9 @@
 | Las mejoras al método llegan a `warp` **por PR**. | Una instancia que detecte una mejora abre un issue o un PR en `warp`. El HANDOFF sigue siendo solo intra-proyecto. |
 | El **piloto es una instancia nueva** creada con el instalador. | El instalador es lo primero que prueba el piloto. |
 | Instalador: **script de Python con solo la biblioteca estándar**, que también actualiza. | Coherente con `check_knowledge.py`. |
-| En la instancia, todo Warp vive bajo **un espacio de nombres `warp/`**. | No choca con el `docs/` y el `scripts/` del software, que la arquitectura prevé en el mismo repo (§3). |
+| El conocimiento vive en una **rama `knowledge` con árbol propio**, independiente del código. El instalador **solo crea `knowledge`**. | Instrucciones de agente, memoria desactivada y merge commit obligatorio se aplican solo a `knowledge`, sin limitar a los desarrolladores. Las ramas del software (`main`, `develop`…) son del equipo que lo desarrolla. Ver §3.1. |
+| Parámetro **`layout: knowledge-only | with-code`** en `warp.yaml`. | En `knowledge-only`, `knowledge` es la rama principal del repo y no existe `main`. En `with-code`, `knowledge` convive con las ramas del código sin tocarlas. |
+| En `knowledge`, todo Warp vive bajo **un espacio de nombres `warp/`**. | Ya no es imprescindible con árbol propio, pero no estorba y deja abierta una disposición con árbol compartido. |
 | El conocimiento vive en **`warp/corpus/`**, separado de los hilos. | Transferir autoridad no mueve archivos. `warp/threads/` solo guarda artefactos operativos. |
 | El ejemplo pasa a ser **una instancia completa** en `examples/minimal/`. | El checker solo tiene que entender instancias, y el ejemplo sirve de corpus de prueba. |
 | La configuración del proyecto vive en **`warp.yaml`, en la raíz**, y las personas en **`warp/USERS.md`**. | Ambos son documentos gobernados por el hilo `governance`. |
@@ -42,7 +44,21 @@ En una instancia hay tres categorías de archivo:
 
 ## 3. Estructura de carpetas
 
-### Instancia
+### 3.1 Ramas
+
+| | `layout: knowledge-only` | `layout: with-code` |
+|---|---|---|
+| Ramas que crea el instalador | `knowledge` | `knowledge`, con árbol propio, sin historia común con el código |
+| Rama principal del repo en GitHub | `knowledge` | la del código; no se toca |
+| Ramas del software | no existen | no se tocan; si el repo está vacío, las crea el equipo de software |
+| Regla «no fusionar `knowledge` en las ramas del código» | no aplica | sí, para que el conocimiento no entre en el árbol del código |
+| Consultar el corpus desde el código | — | con una segunda copia de trabajo de `knowledge` (`git worktree`), o en GitHub. Leer es libre y no exige conectarse a ningún hilo |
+
+- En un repo solo de conocimiento no se crea `main`: estaría vacía o duplicaría `knowledge`, y permitiría escribir por error saltándose sus reglas.
+- Las ramas `agent/<hilo>/<tarea>` no las crea el instalador; nacen de `knowledge` con cada tarea.
+- Cambiar de `knowledge-only` a `with-code` cuando un proyecto incorpora código es una decisión de `governance`.
+
+### 3.2 Árbol de la rama `knowledge`
 
 ```text
 instancia/
@@ -66,7 +82,10 @@ instancia/
 - **`warp/threads/<id>/handoff/`** es el buzón por entradas: un archivo por entrada (evaluación, 4.4).
 - **`warp/index/`** también acogerá el futuro grafo derivado (opción 1 de `INFORME_FASE2_GRAFO.md`).
 
-### Distribución
+- El árbol de las ramas del código es del equipo de software, incluido su propio `AGENTS.md`. Con `with-code`, el instalador solo **sugiere** añadirle una línea del tipo «el conocimiento del proyecto está en la rama `knowledge`; consultarlo es libre».
+- Los workflows de `.github/workflows/` de `knowledge` se aplican a los PRs dirigidos a `knowledge`.
+
+### 3.3 Distribución
 
 ```text
 warp/  (repo)
@@ -139,10 +158,12 @@ project:
   name: Portal de autoservicio
   repository: mi-org/portal-autoservicio
   language: es-ES
+layout: with-code            # knowledge-only | with-code
 enforcement: advisory        # advisory | strict
 ```
 
 - La rama de conocimiento queda **fija como `knowledge`**: forma parte del método y no es configurable.
+- **`layout`** dice si el repo contiene también software (§3.1). Lo usan el instalador, el checker (qué reglas de rama recomendar) y los agentes (si existe código y dónde).
 - **`warp.lock`** (derivado) registra la versión instalada y una huella SHA-256 de cada archivo de `warp/core/` y `warp/scripts/`.
 
 ---
@@ -188,10 +209,10 @@ users:
    - los índices desde las plantillas;
    - `AGENTS.md` y `.claude/settings.json`;
    - la CI, solo con `--ci`.
-5. Crea la rama `knowledge`.
+5. Crea la rama `knowledge` según `layout` (§3.1): como única rama y principal en `knowledge-only`, o con árbol propio, sin tocar las ramas existentes, en `with-code`. No crea `main` ni `develop`.
 6. Ejecuta el checker.
 7. **No hace commit.** Muestra el mensaje propuesto, del tipo `chore(warp): adoptar Warp 2.2.0`, con su «Por qué:», para que la persona lo confirme.
-8. **No toca el remoto.** Imprime la protección recomendada para `knowledge`: sin force-push, checks requeridos (incluido el escaneo de secretos de cada commit del PR), merge commit como único método y mensaje «PR title and description». La persona la aplica.
+8. **No toca el remoto.** Imprime la protección recomendada para `knowledge`: sin force-push, checks requeridos (incluido el escaneo de secretos de cada commit del PR), merge commit como único método y mensaje «PR title and description». Con `with-code`, añade la prohibición de fusionar `knowledge` en las ramas del código y, para el `AGENTS.md` del código, la línea sugerida en §3.2. Recomienda aplicar el método de merge con una regla limitada a `knowledge`, para no afectar al software (verificar en la fase 1 que GitHub lo permite). La persona lo aplica.
 
 ### `upgrade --from <ruta a un clon de warp>`
 
@@ -231,7 +252,8 @@ Hay que actualizar todas las rutas `docs/core/…` del core y del README. Aparec
    - los bloques compactos (`PROJECT_AGENT_CONTEXT.md:126`, `THREAD_CONTEXT_BOOTSTRAP.md:191`) remiten a `warp.yaml`.
 3. **Plantillas nuevas en `warp/core/`:** el instalador necesita formas canónicas que hoy no existen. Solo hay un MANIFEST de ejemplo, no una plantilla. Hacen falta `MANIFEST_TEMPLATE.md`, `HANDOFF_ENTRY_TEMPLATE.md` (formato `yaml`, evaluación 4.14) y `USERS_TEMPLATE.md`.
 4. **`PROJECT_AGENT_CONTEXT.md` §2:** añadir la regla dura de estado fuera del repo (evaluación, 4.5), la regla de criterio sobre información sensible (evaluación, §8b) y el modelo de autoridad en una línea.
-5. **`GIT_COMMIT_RULES.md`:** la integración en `knowledge` se hace con merge commit; los dos niveles de mensaje (decisión y deliberación); y la lectura de las decisiones con `--first-parent` (evaluación, §8b).
+5. **`THREAD_ARCHITECTURE.md` §3 y `PROJECT_WORKING_RULES.md` §2:** hoy dan por hecho tres ramas. Pasan a decir que Warp solo exige `knowledge`, con árbol propio, y que las ramas del software pertenecen a su propio ciclo cuando existe (§3.1).
+6. **`GIT_COMMIT_RULES.md`:** la integración en `knowledge` se hace con merge commit; los dos niveles de mensaje (decisión y deliberación); y la lectura de las decisiones con `--first-parent` (evaluación, §8b).
 
 ### 9.3 Checker
 
