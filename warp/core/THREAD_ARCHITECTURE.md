@@ -1,6 +1,6 @@
 # Warp — Arquitectura de THREADs y conocimiento
 
-**Versión:** 2.11.0  
+**Versión:** 3.0.0  
 **Estado:** Especificación operativa  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -74,7 +74,7 @@ Además, todo MANIFEST debe contener una sección `## Responsabilidad` no vacía
 
 `thread_id` permanece estable durante la vida del THREAD.
 
-`owner` es el `github` de una persona listada en `warp/USERS.md` (§16.3). Un agente nunca es `owner`. Mientras el THREAD no esté `CLOSED` ni `ARCHIVED`, su `owner` debe estar `active`.
+`owner` es el `github` de una persona listada en `USERS.md` (§16.3). Un agente nunca es `owner`. Mientras el THREAD no esté `CLOSED` ni `ARCHIVED`, su `owner` debe estar `active`.
 
 ### 4.2 Origen
 
@@ -106,7 +106,7 @@ No existe `READY_FOR_HANDOFF`: el HANDOFF no representa una transferencia.
 
 Toda instancia tiene exactamente un THREAD con `thread_id: governance`.
 
-Su responsabilidad es la configuración del sistema Warp en el proyecto y sus participantes. Tiene autoridad sobre la configuración del proyecto (§16.1): `warp.yaml`, `warp/USERS.md` y la configuración de agentes y de CI que exista en `knowledge`. No gobierna el contenido del corpus: los documentos transversales del corpus siguen el §11.3.
+Su responsabilidad es la configuración del sistema Warp en el proyecto y sus participantes. Tiene autoridad sobre la configuración del proyecto (§16.1): `warp.yaml`, `USERS.md` y la configuración de agentes y de CI que exista en `knowledge`. No gobierna el contenido del corpus: los documentos transversales del corpus siguen el §11.3.
 
 No puede estar `CLOSED` ni `ARCHIVED` mientras exista la instancia.
 
@@ -181,7 +181,7 @@ Git ya conserva autor, fecha, diff e historial; no deben duplicarse sin una func
 
 ### 7.1 Definición
 
-Cada THREAD tiene exactamente un HANDOFF persistente: el **buzón** `warp/threads/<thread_id>/handoff/`.
+Cada THREAD tiene exactamente un HANDOFF persistente: el **buzón** `threads/<thread_id>/handoff/`.
 
 El HANDOFF es la **cola de inputs pendientes** dirigidos a la responsabilidad del THREAD: propuestas, revisiones, necesidades y peticiones de otros THREADs. Cada input es una **entrada**, y cada entrada es un archivo.
 
@@ -197,7 +197,7 @@ No es:
 
 ### 7.2 Entradas
 
-Una entrada es un archivo `warp/threads/<thread_id>/handoff/<nombre>.md`. El `<nombre>` es descriptivo y en minúsculas con guiones (`formulario-pago-un-paso.md`), es único en el buzón y no es un código de catalogación (`warp/core/GIT_COMMIT_RULES.md` §4). Forma canónica: `warp/core/HANDOFF_ENTRY_TEMPLATE.md`.
+Una entrada es un archivo `threads/<thread_id>/handoff/<nombre>.md`. El `<nombre>` es descriptivo y en minúsculas con guiones (`formulario-pago-un-paso.md`), es único en el buzón y no es un código de catalogación (`warp/core/GIT_COMMIT_RULES.md` §4). Forma canónica: `warp/core/HANDOFF_ENTRY_TEMPLATE.md`.
 
 Una entrada es similar a un ADR en cuanto conserva el contexto de una decisión potencial mientras está abierta, aunque no todas las entradas sean decisiones arquitectónicas.
 
@@ -363,7 +363,7 @@ Si cambia la responsabilidad:
 
 ### THREAD_INDEX
 
-`warp/index/THREAD_INDEX.md`
+`index/THREAD_INDEX.md`
 
 Descubre:
 
@@ -379,7 +379,7 @@ La fuente autoritativa son los MANIFESTs.
 
 ### DOCUMENT_INDEX
 
-`warp/index/DOCUMENT_INDEX.md`
+`index/DOCUMENT_INDEX.md`
 
 Descubre:
 
@@ -388,7 +388,7 @@ Descubre:
 - THREAD con autoridad;
 - MANIFEST que permite verificarla.
 
-Lista exclusivamente los documentos del corpus (`warp/corpus/`). Todo documento del corpus figura en él. La configuración del proyecto, el método y los artefactos de THREAD no se listan (§16.1).
+Lista exclusivamente los documentos del corpus (`corpus/`). Todo documento del corpus figura en él. La configuración del proyecto, el método y los artefactos de THREAD no se listan (§16.1).
 
 Forma canónica: `warp/core/DOCUMENT_INDEX_TEMPLATE.md`.
 
@@ -418,7 +418,7 @@ La decisión es el guardado de unión (merge commit) con que una tarea entra en 
 | bootstrap detallado | `THREAD_CONTEXT_BOOTSTRAP.md` |
 | estrategia Git | `GIT_COMMIT_RULES.md` |
 | configuración del proyecto | `warp.yaml` |
-| participantes | `warp/USERS.md` |
+| participantes | `USERS.md` |
 | identidad/estado de THREAD | MANIFEST |
 | inputs pendientes | HANDOFF |
 | descubrimiento de THREADs | `THREAD_INDEX.md` (derivado) |
@@ -445,34 +445,39 @@ El THREAD cerrado mantiene su MANIFEST y su HANDOFF persistente. El HANDOFF pued
 
 ## 16. Disposición física y capas
 
-Todo Warp vive en la rama `knowledge`, bajo el espacio de nombres `warp/`, salvo los archivos que las herramientas exigen en la raíz:
+La rama `knowledge` de una instancia separa el **método**, en la carpeta `warp/`, de lo **propio del proyecto**, en la raíz:
 
 ```text
+warp/                   el método, tal como se descarga de la distribución
+├── core/               arquitectura, reglas, bootstrap, plantillas
+├── scripts/            herramientas: comprobador e instalador
+├── VERSION             versión del método
+└── LICENSE-DOCS, LICENSE-CODE
 warp.yaml               configuración del proyecto
-(configuración de agentes y CI, p. ej. AGENTS.md, .claude/, .github/)
-warp/
-├── core/               método: arquitectura, reglas, bootstrap, plantillas
-├── scripts/            herramientas: comprobador estructural
-├── index/              índices derivados (THREAD_INDEX.md, DOCUMENT_INDEX.md)
-├── threads/
+warp.lock               huellas del método instalado
+USERS.md                participantes del proyecto
+threads/
 │   └── <thread_id>/    artefactos operativos: MANIFEST.md, handoff/
-├── corpus/             documentos de conocimiento, organizados por tema
-└── USERS.md            participantes del proyecto
+corpus/                 documentos de conocimiento, organizados por tema
+index/                  índices derivados (THREAD_INDEX.md, DOCUMENT_INDEX.md)
+(configuración de agentes y CI, p. ej. AGENTS.md, .claude/, .github/)
 ```
 
-La ubicación física no determina la autoridad documental: la declara el MANIFEST del THREAD responsable y la muestra `warp/index/DOCUMENT_INDEX.md`.
+**El método no se copia: se descarga.** Una instancia nace de descomprimir el paquete de una versión publicada, que contiene solo `warp/`, en una carpeta vacía. El instalador crea a su lado lo propio del proyecto. Actualizar es sustituir `warp/` por la carpeta de una versión posterior.
 
-Los artefactos operativos de un THREAD se nombran por rol (`MANIFEST.md` y el buzón `handoff/`) y viven en `warp/threads/<thread_id>/`. Los documentos de conocimiento viven en `warp/corpus/`, organizados por tema y nunca por THREAD: así se refuerza que no son silos privados, y transferir su autoridad (§11.4) no obliga a moverlos ni rompe sus rutas.
+La ubicación física no determina la autoridad documental: la declara el MANIFEST del THREAD responsable y la muestra `index/DOCUMENT_INDEX.md`.
+
+Los artefactos operativos de un THREAD se nombran por rol (`MANIFEST.md` y el buzón `handoff/`) y viven en `threads/<thread_id>/`. Los documentos de conocimiento viven en `corpus/`, organizados por tema y nunca por THREAD: así se refuerza que no son silos privados, y transferir su autoridad (§11.4) no obliga a moverlos ni rompe sus rutas.
 
 ### 16.1 Categorías de archivo
 
 | Categoría | Archivos | Autoridad |
 |---|---|---|
-| **sistema** | método (`warp/core/`) y herramientas (`warp/scripts/`) | ninguna en la instancia: viene de la distribución de Warp, es de solo lectura y solo cambia al actualizar de versión |
-| **derivados** | `warp/index/` y `warp.lock` | ninguna: se regeneran y nunca se editan a mano |
-| **corpus** | `warp/corpus/` | el THREAD que la declare en su MANIFEST; se descubre en `warp/index/DOCUMENT_INDEX.md` y es transferible (§11.4) |
-| **artefactos de THREAD** | `warp/threads/<thread_id>/` | el propio THREAD; su HANDOFF admite entradas de otros THREADs (§7.3) |
-| **configuración del proyecto** | `warp.yaml`, `warp/USERS.md` y la configuración de agentes y CI | el THREAD `governance` (§4.4) |
+| **sistema** | `warp/` | ninguna en la instancia: viene de la distribución de Warp, es de solo lectura y solo cambia al actualizar de versión |
+| **derivados** | `index/` y `warp.lock` | ninguna: se regeneran y nunca se editan a mano |
+| **corpus** | `corpus/` | el THREAD que la declare en su MANIFEST; se descubre en `index/DOCUMENT_INDEX.md` y es transferible (§11.4) |
+| **artefactos de THREAD** | `threads/<thread_id>/` | el propio THREAD; su HANDOFF admite entradas de otros THREADs (§7.3) |
+| **configuración del proyecto** | `warp.yaml`, `USERS.md` y la configuración de agentes y CI | el THREAD `governance` (§4.4) |
 
 La regla de autoridad única (§11.2) se cumple en las tres últimas categorías, cada una con su forma de asignarla.
 
@@ -498,7 +503,7 @@ El nombre de la rama de conocimiento no es configurable: es `knowledge`.
 
 `enforcement` regula solo las comprobaciones sobre **personas**: que el `owner` sea un participante activo y que la integración la haga o la apruebe el `owner` (§4.5). Con `advisory` son avisos; con `strict`, errores y requisito de merge. Las invariantes estructurales son siempre errores. En repos privados, hacer `strict` obligatorio en GitHub requiere un plan con protección de ramas.
 
-### 16.3 `warp/USERS.md`
+### 16.3 `USERS.md`
 
 Lista de participantes del proyecto. Forma canónica: `warp/core/USERS_TEMPLATE.md`.
 
@@ -515,7 +520,7 @@ Lista de participantes del proyecto. Forma canónica: `warp/core/USERS_TEMPLATE.
 La arquitectura considera abiertas únicamente cuestiones que no alteran las invariantes anteriores:
 
 - futura taxonomía de THREADs (investigación, gestión u otros);
-- organización temática interna de `warp/corpus/`;
+- organización temática interna de `corpus/`;
 - reglas de agrupación de autoridad para conjuntos de documentos, manteniendo un único THREAD efectivo por documento;
 - posible integración futura de `warp/scripts/check_knowledge.py` en CI o protecciones de `knowledge`;
 - evolución futura hacia modelos de grafo si aportan valor real sin complejidad innecesaria.
@@ -538,3 +543,4 @@ La arquitectura considera abiertas únicamente cuestiones que no alteran las inv
 | 2.9.0 | 2026-10-27 | §9.4: el PR de una tarea se dirige siempre a `knowledge`. Entrada para agentes en `AGENTS.md` (plantilla `AGENTS_TEMPLATE.md`). |
 | 2.10.0 | 2026-10-27 | Versión del método: `warp/VERSION` en la capa de sistema, con esquema MAJOR.MINOR.PATCH; `warp_version` coincide con ella. |
 | 2.11.0 | 2026-10-27 | `warp.lock` como derivado: huellas de la capa de sistema, comprobadas por el checker. |
+| 3.0.0 | 2026-10-27 | §16: el método vive en `warp/`, tal como se descarga, y lo propio del proyecto en la raíz (`corpus/`, `threads/`, `index/`, `USERS.md`); el método no se copia, se descarga, y actualizar es sustituir `warp/`. La capa de sistema es `warp/` entera. |

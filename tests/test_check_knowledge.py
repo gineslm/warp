@@ -18,13 +18,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 CHECKER = os.path.join(ROOT, "warp", "scripts", "check_knowledge.py")
 INSTANCE = os.path.join(ROOT, "examples", "minimal")
-THREAD = os.path.join("warp", "threads", "example-notes")
+THREAD = os.path.join("threads", "example-notes")
 
 
 def entry(origin, typ="proposal", contexto="Contexto de prueba.", extra=""):
     lines = ["origin_thread: %s" % origin]
     if typ: lines.append("type: %s" % typ)
-    lines += ["summary: s", "target_scope: warp/corpus/NOTES.md", "status: proposed"]
+    lines += ["summary: s", "target_scope: corpus/NOTES.md", "status: proposed"]
     return ("# Entrada\n\n```yaml\n%s\n```\n%s\n## Contexto\n\n%s\n\n"
             "## Evidencia\n\nEvidencia de prueba.\n" % ("\n".join(lines), extra, contexto))
 
@@ -133,27 +133,27 @@ class CheckKnowledge(unittest.TestCase):
 
     def test_handoff_path_antiguo_a_archivo(self):
         self.replace(os.path.join(THREAD, "MANIFEST.md"),
-                     "path: warp/threads/example-notes/handoff/",
-                     "path: warp/threads/example-notes/HANDOFF.md")
+                     "path: threads/example-notes/handoff/",
+                     "path: threads/example-notes/HANDOFF.md")
         code, out = self.run_checker()
         self.assertEqual(code, 1, out)
-        self.assertIn("handoff.path debe ser 'warp/threads/example-notes/handoff/'", out)
+        self.assertIn("handoff.path debe ser 'threads/example-notes/handoff/'", out)
 
     def test_falta_el_buzon(self):
-        shutil.rmtree(os.path.join(self.root, "warp", "threads", "governance", "handoff"))
+        shutil.rmtree(os.path.join(self.root, "threads", "governance", "handoff"))
         code, out = self.run_checker()
         self.assertEqual(code, 1, out)
         self.assertIn("falta el buzón handoff/", out)
 
     def test_ningun_no_anula_rutas_declaradas(self):
         self.replace(os.path.join(THREAD, "MANIFEST.md"),
-                     "- `warp/corpus/NOTES.md`\n",
-                     "- `warp/corpus/NOTES.md`\n\nNingún otro documento.\n")
+                     "- `corpus/NOTES.md`\n",
+                     "- `corpus/NOTES.md`\n\nNingún otro documento.\n")
         code, out = self.run_checker()
         self.assertEqual(code, 0, out)
 
     def test_falta_fila_en_thread_index(self):
-        self.replace(os.path.join("warp", "index", "THREAD_INDEX.md"),
+        self.replace(os.path.join("index", "THREAD_INDEX.md"),
                      "| `example-notes` |", "| `otro` |")
         code, out = self.run_checker()
         self.assertEqual(code, 1, out)
@@ -172,58 +172,58 @@ class CheckKnowledge(unittest.TestCase):
         self.assert_error("layout 'mixto' no válido")
 
     def test_warp_version_distinta_de_la_del_metodo(self):
-        self.replace("warp.yaml", "warp_version: 3.1.0", "warp_version: 2.9.0")
-        self.assert_error("warp_version '2.9.0' no coincide con warp/VERSION '3.1.0'")
+        self.replace("warp.yaml", "warp_version: 4.0.0", "warp_version: 2.9.0")
+        self.assert_error("warp_version '2.9.0' no coincide con warp/VERSION '4.0.0'")
 
     def test_warp_yaml_sin_campo_de_proyecto(self):
         self.replace("warp.yaml", "  repository: ejemplo/warp-minimal\n", "")
         self.assert_error("falta project.repository")
 
     def test_usuario_con_status_no_valido(self):
-        self.replace(os.path.join("warp", "USERS.md"), "| `active` |", "| `baja` |")
+        self.replace("USERS.md", "| `active` |", "| `baja` |")
         self.assert_error("status 'baja' no válido")
 
     def test_usuario_duplicado(self):
         row = "| `usuario-ejemplo` | `Persona de ejemplo` | `active` |\n"
-        self.replace(os.path.join("warp", "USERS.md"), row, row + row)
+        self.replace("USERS.md", row, row + row)
         self.assert_error("github duplicado 'usuario-ejemplo'")
 
     def test_sin_participantes_activos(self):
-        self.replace(os.path.join("warp", "USERS.md"), "| `active` |", "| `inactive` |")
+        self.replace("USERS.md", "| `active` |", "| `inactive` |")
         self.assert_error("no hay ningún participante active")
 
     def test_falta_governance(self):
-        shutil.rmtree(os.path.join(self.root, "warp", "threads", "governance"))
-        self.replace(os.path.join("warp", "index", "THREAD_INDEX.md"),
+        shutil.rmtree(os.path.join(self.root, "threads", "governance"))
+        self.replace(os.path.join("index", "THREAD_INDEX.md"),
                      "| `governance` |", "| `x` |")
         self.assert_error("exactamente un THREAD 'governance' (hay 0)")
 
     def test_governance_archivado(self):
-        gov = os.path.join("warp", "threads", "governance", "MANIFEST.md")
+        gov = os.path.join("threads", "governance", "MANIFEST.md")
         self.replace(gov, "status: ACTIVE", "status: ARCHIVED")
-        self.replace(os.path.join("warp", "index", "THREAD_INDEX.md"),
+        self.replace(os.path.join("index", "THREAD_INDEX.md"),
                      "| `governance` | `ACTIVE` |", "| `governance` | `ARCHIVED` |")
         self.assert_error("governance no puede estar ARCHIVED")
 
     def test_governance_sin_autoridad_sobre_users(self):
-        self.replace(os.path.join("warp", "threads", "governance", "MANIFEST.md"),
-                     "- `warp/USERS.md`\n", "")
-        self.assert_error("governance debe tener autoridad sobre 'warp/USERS.md'")
+        self.replace(os.path.join("threads", "governance", "MANIFEST.md"),
+                     "- `USERS.md`\n", "")
+        self.assert_error("governance debe tener autoridad sobre 'USERS.md'")
 
     def test_otro_hilo_reclama_configuracion(self):
         self.replace(os.path.join(THREAD, "MANIFEST.md"),
-                     "- `warp/corpus/NOTES.md`\n",
-                     "- `warp/corpus/NOTES.md`\n- `warp.yaml`\n")
+                     "- `corpus/NOTES.md`\n",
+                     "- `corpus/NOTES.md`\n- `warp.yaml`\n")
         self.assert_error("'warp.yaml' es configuración del proyecto")
 
     def test_documento_del_corpus_sin_indexar(self):
-        with open(os.path.join(self.root, "warp", "corpus", "HUERFANO.md"), "w",
+        with open(os.path.join(self.root, "corpus", "HUERFANO.md"), "w",
                   encoding="utf-8") as f:
             f.write("# huérfano\n")
-        self.assert_error("falta el documento del corpus 'warp/corpus/HUERFANO.md'")
+        self.assert_error("falta el documento del corpus 'corpus/HUERFANO.md'")
 
     def test_gitkeep_en_el_corpus_no_es_un_documento(self):
-        open(os.path.join(self.root, "warp", "corpus", ".gitkeep"), "w").close()
+        open(os.path.join(self.root, "corpus", ".gitkeep"), "w").close()
         code, out = self.run_checker()
         self.assertEqual(code, 0, out)
 
@@ -236,16 +236,16 @@ class CheckKnowledge(unittest.TestCase):
                      "owner: usuario-ejemplo", "owner: alguien")
         code, out = self.run_checker()
         self.assertEqual(code, 0, out)
-        self.assertIn("[WARN]  warp/threads/example-notes/MANIFEST.md: owner 'alguien' no figura", out)
+        self.assertIn("[WARN]  threads/example-notes/MANIFEST.md: owner 'alguien' no figura", out)
 
     def test_owner_desconocido_strict_falla(self):
         self.replace("warp.yaml", "enforcement: advisory", "enforcement: strict")
         self.replace(os.path.join(THREAD, "MANIFEST.md"),
                      "owner: usuario-ejemplo", "owner: alguien")
-        self.assert_error("owner 'alguien' no figura en warp/USERS.md")
+        self.assert_error("owner 'alguien' no figura en USERS.md")
 
     def add_inactive_user(self):
-        self.replace(os.path.join("warp", "USERS.md"),
+        self.replace("USERS.md",
                      "| `usuario-ejemplo` | `Persona de ejemplo` | `active` |\n",
                      "| `usuario-ejemplo` | `Persona de ejemplo` | `active` |\n"
                      "| `antiguo` | `Persona que se fue` | `inactive` |\n")
@@ -262,15 +262,15 @@ class CheckKnowledge(unittest.TestCase):
         self.add_inactive_user()
         self.replace(os.path.join(THREAD, "MANIFEST.md"),
                      "status: ACTIVE", "status: ARCHIVED")
-        self.replace(os.path.join("warp", "index", "THREAD_INDEX.md"),
+        self.replace(os.path.join("index", "THREAD_INDEX.md"),
                      "| `example-notes` | `ACTIVE` |", "| `example-notes` | `ARCHIVED` |")
         code, out = self.run_checker()
         self.assertEqual(code, 0, out)
 
     def test_documento_index_fuera_del_corpus(self):
-        self.replace(os.path.join("warp", "index", "DOCUMENT_INDEX.md"),
-                     "| `warp/corpus/NOTES.md` |", "| `warp/USERS.md` |")
-        self.assert_error("'warp/USERS.md' no pertenece al corpus")
+        self.replace(os.path.join("index", "DOCUMENT_INDEX.md"),
+                     "| `corpus/NOTES.md` |", "| `USERS.md` |")
+        self.assert_error("'USERS.md' no pertenece al corpus")
 
 
 if __name__ == "__main__":

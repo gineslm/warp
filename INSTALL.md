@@ -1,32 +1,78 @@
 # Instalar Warp en un proyecto
 
-Esta guía crea una **instancia** de Warp: un repositorio cuya rama `knowledge` contiene el método y el conocimiento de un proyecto. El repositorio `warp` es la distribución del método; no se trabaja en él para gestionar un proyecto.
+Una **instancia** de Warp es la carpeta de un proyecto que gestiona su conocimiento con el método. Se crea en dos pasos: **descargar** el método en una carpeta vacía y **ejecutar el instalador** en esa misma carpeta. El método no se copia: el instalador crea a su lado lo propio del proyecto.
 
-> El instalador solo admite, por ahora, repositorios **solo de conocimiento** (`layout: knowledge-only`). La instalación en un repositorio que ya contiene código (`with-code`) llegará en una versión posterior.
+```text
+mi-proyecto/
+├── warp/        ← el método, tal como se descarga (no se edita)
+├── warp.yaml    ← lo demás lo crea el instalador
+├── USERS.md
+├── threads/
+├── corpus/
+├── index/
+└── AGENTS.md
+```
+
+> Por ahora el instalador solo admite repositorios **solo de conocimiento** (`layout: knowledge-only`). La instalación junto a código existente (`with-code`) llegará en una versión posterior.
 
 ## 1. Requisitos
 
 - Git 2.20 o posterior, con identidad configurada (`git config user.name` y `user.email`).
 - Python 3.8 o posterior. Solo usa la biblioteca estándar.
-- Opcional, para crear el repositorio en GitHub: [GitHub CLI](https://cli.github.com/) con la sesión iniciada (`gh auth login`). El instalador nunca pide ni guarda credenciales: usa la sesión de `gh`.
+- Opcional, para crear el repositorio en GitHub: [GitHub CLI](https://cli.github.com/) con la sesión iniciada (`gh auth login`). El instalador nunca pide ni guarda credenciales.
 
-## 2. Obtener una versión del método
+## 2. Descargar el método
 
-Instala siempre desde una versión publicada, no desde `main`:
+1. Crea una carpeta vacía para el proyecto, por ejemplo `mi-proyecto`.
+2. Descarga el paquete de la última versión, `warp-<versión>.zip`, desde la página de [versiones de Warp](https://github.com/gineslm/warp/releases/latest).
+3. Descomprímelo dentro de `mi-proyecto`. Debe quedar `mi-proyecto/warp/` y nada más.
 
-```bash
-git clone --branch v3.1.0 https://github.com/gineslm/warp.git
-```
-
-Las versiones publicadas son las etiquetas `vX.Y.Z` del repositorio; sus notas explican qué cambia en cada una.
-
-## 3. Preparar la instancia: `init`
+Con GitHub CLI, desde la carpeta del proyecto:
 
 ```bash
-python warp/warp/scripts/warp.py init ../mi-proyecto
+gh release download --repo gineslm/warp --pattern "warp-*.zip"
 ```
 
-El destino debe ser un directorio vacío o que no exista. El instalador pregunta:
+y después descomprime el zip y bórralo.
+
+No clones el repositorio `gineslm/warp`: trae la documentación y el historial de la distribución, que no pertenecen a tu proyecto.
+
+## 3. Instalar con un agente (recomendado)
+
+Abre un agente de programación (Claude Code, Codex…) **en la carpeta del proyecto** y pégale este prompt:
+
+```text
+Quiero instalar Warp en esta carpeta. Contiene solo la carpeta warp/, con el
+método descargado. Hazlo así:
+
+1. Ejecuta `python warp/scripts/warp.py init --help` para ver qué datos
+   necesita el instalador y el formato del archivo de configuración.
+2. Pregúntame esos datos uno a uno: nombre del proyecto; idioma (por defecto
+   es-ES); propietario en GitHub (usuario u organización); nombre del
+   repositorio; si quiero crear el repositorio en GitHub y, en ese caso, su
+   visibilidad (por defecto privado); los participantes (usuario de GitHub y
+   nombre visible de cada uno), y quién de ellos es el responsable del THREAD
+   governance. Usa layout knowledge-only y enforcement advisory salvo que te
+   diga otra cosa.
+3. Con mis respuestas, escribe el archivo de configuración FUERA de esta
+   carpeta (por ejemplo, en una carpeta temporal) y ejecuta
+   `python warp/scripts/warp.py init --config <ese archivo>`.
+4. Enséñame el resultado del checker y el mensaje propuesto para el commit
+   inicial, y espera a que lo confirme. No ejecutes nada más hasta entonces.
+5. Cuando lo confirme, ejecuta `python warp/scripts/warp.py publish`.
+6. Al terminar, lee AGENTS.md y explícame en pocas líneas cómo empezar a
+   trabajar: cómo crear el primer THREAD y su primer documento.
+```
+
+## 4. Instalar a mano
+
+Desde la carpeta del proyecto:
+
+```bash
+python warp/scripts/warp.py init
+```
+
+El instalador pregunta:
 
 | Dato | Ejemplo |
 |---|---|
@@ -41,25 +87,10 @@ El destino debe ser un directorio vacío o que no exista. El instalador pregunta
 | participantes | usuario de GitHub y nombre visible de cada persona |
 | responsable del THREAD `governance` | uno de los participantes |
 
-Para un agente o una instalación automatizada, los mismos datos pueden darse en un archivo JSON:
+Los mismos datos pueden darse en un archivo JSON, guardado fuera de la carpeta del proyecto. `python warp/scripts/warp.py init --help` muestra su formato:
 
 ```bash
-python warp/warp/scripts/warp.py init ../mi-proyecto --config instalacion.json
-```
-
-```json
-{
-  "project": {"name": "Portal de autoservicio", "language": "es-ES"},
-  "github": {"owner": "mi-org", "repo": "portal-conocimiento",
-             "create_remote": true, "visibility": "private"},
-  "layout": "knowledge-only",
-  "enforcement": "advisory",
-  "users": [
-    {"github": "usuario-ux", "name": "Responsable de UX"},
-    {"github": "usuario-ing", "name": "Responsable de ingeniería"}
-  ],
-  "governance_owner": "usuario-ux"
-}
+python warp/scripts/warp.py init --config ../instalacion.json
 ```
 
 `init` crea la instancia en la rama `knowledge`, **sin hacer commit**, ejecuta el checker y muestra el mensaje propuesto para el commit inicial.
@@ -68,22 +99,20 @@ python warp/warp/scripts/warp.py init ../mi-proyecto --config instalacion.json
 
 | Archivo | Qué es |
 |---|---|
-| `warp/core/`, `warp/scripts/`, `warp/VERSION`, `warp/LICENSE-*` | el método, de solo lectura en la instancia |
-| `warp.lock` | huellas de la capa de sistema; el checker comprueba que no se ha editado |
 | `warp.yaml` | configuración del proyecto |
-| `warp/USERS.md` | participantes |
-| `warp/threads/governance/` | THREAD de gobierno, con su buzón vacío |
-| `warp/index/` | índices de THREADs y del corpus |
-| `warp/corpus/` | el corpus, vacío |
+| `warp.lock` | huellas del método; el checker comprueba que `warp/` no se ha editado |
+| `USERS.md` | participantes |
+| `threads/governance/` | THREAD de gobierno, con su buzón vacío |
+| `index/` | índices de THREADs y del corpus |
+| `corpus/` | el corpus, vacío |
 | `AGENTS.md` | entrada para agentes de programación |
 | `.claude/settings.json` | memoria automática desactivada y reglas de permiso de Claude Code |
 
-## 4. Confirmar y publicar: `publish`
+## 5. Confirmar y publicar
 
-Revisa el mensaje propuesto. Si es correcto:
+Revisa el mensaje propuesto. Si es correcto, desde la carpeta del proyecto:
 
 ```bash
-cd ../mi-proyecto
 python warp/scripts/warp.py publish
 ```
 
@@ -95,16 +124,15 @@ python warp/scripts/warp.py publish
 
 Si no se pidió repositorio remoto, el commit queda en local y puedes publicarlo más tarde.
 
-### Recomendado, a mano
+**Recomendado, a mano:** proteger `knowledge` en GitHub (*Settings → Branches*): sin force-push y, cuando haya CI, con checks obligatorios. En repositorios privados, la protección de ramas requiere GitHub Pro o Team.
 
-Proteger `knowledge` en GitHub (*Settings → Branches*): sin force-push y, cuando haya CI, con checks obligatorios. En repositorios privados, la protección de ramas requiere GitHub Pro o Team.
-
-## 5. Después de instalar
+## 6. Después de instalar
 
 - **Primer THREAD:** crea su MANIFEST y su buzón a partir de `warp/core/MANIFEST_TEMPLATE.md`, siguiendo `warp/core/THREAD_ARCHITECTURE.md` §5–§6.
 - **Trabajar con agentes:** el agente lee `AGENTS.md`, que remite al contexto mínimo (`warp/core/PROJECT_AGENT_CONTEXT.md`).
-- **Comprobar la estructura:** `python warp/scripts/check_knowledge.py` desde la raíz de la instancia.
+- **Comprobar la estructura:** `python warp/scripts/check_knowledge.py` desde la carpeta del proyecto.
+- **Actualizar el método:** descarga el paquete de la versión nueva y sustituye la carpeta `warp/`. Ajustar `warp_version` en `warp.yaml` y regenerar `warp.lock` será automático con `warp.py upgrade`, en una versión posterior.
 
-## 6. Proponer mejoras al método
+## 7. Proponer mejoras al método
 
 El método no se edita en la instancia: `warp.lock` lo detecta. Las mejoras se proponen al repositorio [`gineslm/warp`](https://github.com/gineslm/warp) mediante un issue o un PR.

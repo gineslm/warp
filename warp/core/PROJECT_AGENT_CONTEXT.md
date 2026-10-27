@@ -1,6 +1,6 @@
 # Warp — Contexto mínimo del proyecto para agentes
 
-**Versión:** 2.7.0  
+**Versión:** 2.7.1  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -61,7 +61,7 @@ Para trabajo ordinario dentro de un THREAD ya existente, esta superficie es sufi
 | guardar cambios | `GIT_COMMIT_RULES.md` |
 | modificar MANIFESTs, HANDOFFs, índices o autoridad documental | además ejecutar `python warp/scripts/check_knowledge.py` antes de consolidar |
 | empezar o retomar una tarea | `THREAD_ARCHITECTURE.md` §9.4: comprobar si ya existe su rama o su PR |
-| cambiar `warp.yaml`, `warp/USERS.md` o la configuración de agentes y CI | `THREAD_ARCHITECTURE.md` §4.4 y §16: es trabajo del THREAD `governance` |
+| cambiar `warp.yaml`, `USERS.md` o la configuración de agentes y CI | `THREAD_ARCHITECTURE.md` §4.4 y §16: es trabajo del THREAD `governance` |
 | trabajar dentro de tu THREAD en documentos bajo su autoridad | nada más: MANIFEST + HANDOFF + corpus relevante bastan |
 
 La divulgación progresiva reduce contexto, pero no reduce autoridad ni obligaciones. Si existe duda sobre una operación, se consulta la fuente canónica extensa antes de actuar.
@@ -72,13 +72,13 @@ La divulgación progresiva reduce contexto, pero no reduce autoridad ni obligaci
 - Reglas permanentes: `warp/core/PROJECT_WORKING_RULES.md`.
 - Bootstrap detallado: `warp/core/THREAD_CONTEXT_BOOTSTRAP.md`.
 - Estrategia Git: `warp/core/GIT_COMMIT_RULES.md`.
-- Índice de THREADs: `warp/index/THREAD_INDEX.md`.
-- Índice documental: `warp/index/DOCUMENT_INDEX.md`.
+- Índice de THREADs: `index/THREAD_INDEX.md`.
+- Índice documental: `index/DOCUMENT_INDEX.md`.
 - Plantilla de índice de THREADs: `warp/core/THREAD_INDEX_TEMPLATE.md`.
 - Plantilla de índice documental: `warp/core/DOCUMENT_INDEX_TEMPLATE.md`.
 - Comprobador estructural: `warp/scripts/check_knowledge.py`.
 - Configuración del proyecto: `warp.yaml`.
-- Participantes: `warp/USERS.md`.
+- Participantes: `USERS.md`.
 
 ## 6. Comandos de entrada
 
@@ -144,3 +144,4 @@ Antes de terminar:
 | 2.5.0 | 2026-10-27 | La regla dura 7 distingue decisión (guardado de unión en `knowledge`) y deliberación (guardados de la rama). |
 | 2.6.0 | 2026-10-27 | Reglas duras 9 (ninguna memoria externa al repositorio es fuente de verdad) y 10 (lo que no puede quedar para siempre no se escribe en el repositorio). |
 | 2.7.0 | 2026-10-27 | Regla dura 11: el agente muestra el mensaje propuesto y espera la confirmación de la persona antes de cada decisión. |
+| 2.7.1 | 2026-10-27 | Rutas del proyecto en la raíz de la instancia (`corpus/`, `threads/`, `index/`, `USERS.md`); el método queda en `warp/`. Sin cambios de fondo. |

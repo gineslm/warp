@@ -2,9 +2,14 @@
 # -*- coding: utf-8 -*-
 """Warp: instalador de instancias.
 
-  init <destino> [--config archivo.json]
-      Prepara una instancia en local, en la rama `knowledge`, sin hacer commit,
-      y muestra el mensaje del commit inicial para que la persona lo confirme.
+Se ejecuta desde la carpeta del proyecto, donde se ha descomprimido el paquete
+de una versión de Warp (que contiene solo `warp/`). El método no se copia: el
+instalador crea a su lado lo propio del proyecto.
+
+  init [<carpeta>] [--config archivo.json]
+      Prepara la instancia en la carpeta (por defecto, la actual), en la rama
+      `knowledge`, sin hacer commit, y muestra el mensaje del commit inicial
+      para que la persona lo confirme.
   publish [<destino>]
       Tras la confirmación: hace el commit inicial y, si se pidió, crea el
       repositorio en GitHub, sube `knowledge` y aplica los ajustes de merge.
@@ -27,8 +32,21 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from check_knowledge import digest, system_files  # noqa: E402
 
-SOURCE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+METHOD = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # la carpeta warp/
 STATE = "warp-init.json"  # vive en .git/: nunca se versiona
+CONFIG_EXAMPLE = """\
+{
+  "project": {"name": "Portal de autoservicio", "language": "es-ES"},
+  "github": {"owner": "mi-org", "repo": "portal-conocimiento",
+             "create_remote": true, "visibility": "private"},
+  "layout": "knowledge-only",
+  "enforcement": "advisory",
+  "users": [
+    {"github": "usuario-ux", "name": "Responsable de UX"},
+    {"github": "usuario-ing", "name": "Responsable de ingeniería"}
+  ],
+  "governance_owner": "usuario-ux"
+}"""
 GITHUB_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]{0,38}$")
 REPO_NAME = re.compile(r"^[A-Za-z0-9._-]{1,100}$")
 UNSAFE = re.compile(r"[|`]|\s#")
@@ -90,7 +108,13 @@ def read(path):
 
 def ask(question, default=None):
     suffix = " [%s]" % default if default else ""
-    answer = input("%s%s: " % (question, suffix)).strip()
+    try:
+        answer = input("%s%s: " % (question, suffix)).strip()
+    except EOFError:
+        # Sin nadie que responda (p. ej. un agente): en Windows NUL pasa por terminal.
+        print()
+        fail("no hay terminal para las preguntas: usa --config con un archivo JSON "
+             "(ver `python warp/scripts/warp.py init --help`).")
     return answer or default or ""
 
 
@@ -194,7 +218,7 @@ origin:
 repository:
   knowledge_branch: knowledge
 handoff:
-  path: warp/threads/governance/handoff/
+  path: threads/governance/handoff/
 ```
 
 ## Responsabilidad
@@ -204,18 +228,18 @@ Gobernar la configuración del sistema Warp en este proyecto y sus participantes
 ## Dentro de alcance
 
 - mantener la configuración del proyecto en `warp.yaml`;
-- mantener la lista de participantes en `warp/USERS.md`;
+- mantener la lista de participantes en `USERS.md`;
 - mantener la configuración de agentes (`AGENTS.md`, `.claude/settings.json`) y de CI.
 
 ## Fuera de alcance
 
-- el contenido de `warp/corpus/`, que gobiernan los THREADs que declaran su autoridad;
+- el contenido de `corpus/`, que gobiernan los THREADs que declaran su autoridad;
 - el método (`warp/core/`, `warp/scripts/`), que se cambia actualizando de versión.
 
 ## Autoridad documental vigente
 
 - `warp.yaml`
-- `warp/USERS.md`
+- `USERS.md`
 - `AGENTS.md`
 - `.claude/settings.json`
 
@@ -248,7 +272,7 @@ def thread_index(c):
 
 | thread_id | status | domain | responsibility | MANIFEST | HANDOFF |
 |---|---|---|---|---|---|
-| `governance` | `ACTIVE` | `gobierno del proyecto` | `Configuración del sistema Warp en el proyecto y sus participantes.` | `warp/threads/governance/MANIFEST.md` | `warp/threads/governance/handoff/` |
+| `governance` | `ACTIVE` | `gobierno del proyecto` | `Configuración del sistema Warp en el proyecto y sus participantes.` | `threads/governance/MANIFEST.md` | `threads/governance/handoff/` |
 
 ## Mantenimiento
 
@@ -259,7 +283,7 @@ Regenerar cuando se cree, archive/cierre, reactive o cambie de responsabilidad u
 def document_index(c):
     return INDEX_HEAD.format(
         name=c["name"], title="Índice documental",
-        nature="Artefacto derivado y no autoritativo de descubrimiento del corpus (`warp/corpus/`). Todos los THREADs pueden leer el corpus; la columna `authority_thread` indica exclusivamente quién puede evolucionar directamente cada documento.") + \
+        nature="Artefacto derivado y no autoritativo de descubrimiento del corpus (`corpus/`). Todos los THREADs pueden leer el corpus; la columna `authority_thread` indica exclusivamente quién puede evolucionar directamente cada documento.") + \
         """## Documentos
 
 | path | purpose / scope | authority_thread | authority_manifest |
@@ -282,23 +306,24 @@ def commit_message(c, version):
     return ("chore(warp): adoptar Warp %s en %s\n\n"
             "Por qué:\n"
             "Se instala el método Warp para gestionar el conocimiento del proyecto:\n"
-            "capa de sistema en warp/, configuración en warp.yaml, participantes en\n"
-            "warp/USERS.md y el THREAD governance como responsable de la\n"
-            "configuración. Responsable de governance: %s.\n"
+            "el método en warp/, tal como se descargó; configuración en warp.yaml,\n"
+            "participantes en USERS.md y el THREAD governance como responsable de\n"
+            "la configuración. Responsable de governance: %s.\n"
             % (version, c["name"], c["governance_owner"]))
 
 
-def copy_system_layer(dest):
-    for path in system_files(SOURCE):
-        target = os.path.join(dest, *path.split("/"))
-        os.makedirs(os.path.dirname(target), exist_ok=True)
-        # copyfile y no copy2: no se copian atributos como el de solo lectura.
-        shutil.copyfile(os.path.join(SOURCE, *path.split("/")), target)
-    for name in ("LICENSE-DOCS", "LICENSE-CODE"):
-        if not os.path.isfile(os.path.join(dest, "warp", name)):
-            src = os.path.join(SOURCE, name)
-            if not os.path.isfile(src): fail("no se encuentra %s en la distribución." % name)
-            shutil.copyfile(src, os.path.join(dest, "warp", name))
+def check_target(dest):
+    """La carpeta debe contener solo el paquete descomprimido: `warp/`."""
+    if os.path.normcase(os.path.join(dest, "warp")) != os.path.normcase(METHOD):
+        fail("ejecuta el instalador de la carpeta warp/ del propio proyecto:\n"
+             "  python warp/scripts/warp.py init")
+    others = sorted(x for x in os.listdir(dest) if x != "warp")
+    if others:
+        fail("la carpeta del proyecto solo debe contener warp/ (el paquete descargado). "
+             "Sobra: %s" % ", ".join(others))
+    for need in ("VERSION", "core", "scripts"):
+        if not os.path.exists(os.path.join(METHOD, need)):
+            fail("warp/ está incompleta: falta warp/%s." % need)
 
 
 def lock_text(dest, version):
@@ -320,30 +345,33 @@ def run_checker(dest):
 # --- Comandos ----------------------------------------------------------------
 
 def cmd_init(args):
-    dest = os.path.abspath(args.destino)
-    if os.path.exists(dest) and (not os.path.isdir(dest) or os.listdir(dest)):
-        fail("el destino debe ser un directorio vacío o inexistente: %s" % dest)
+    dest = os.path.abspath(args.destino or os.getcwd())
+    check_target(dest)
     if args.config:
+        cfg_path = os.path.normcase(os.path.abspath(args.config))
+        if cfg_path.startswith(os.path.normcase(dest + os.sep)):
+            fail("guarda el archivo de --config fuera de la carpeta del proyecto.")
         with open(args.config, encoding="utf-8") as f:
             cfg = json.load(f)
+    elif not sys.stdin.isatty():
+        fail("no hay terminal para las preguntas: usa --config con un archivo JSON "
+             "(ver `python warp/scripts/warp.py init --help`).")
     else:
         cfg = interactive()
     c = validate(cfg)
-    version = read(os.path.join(SOURCE, "warp", "VERSION")).strip()
+    version = read(os.path.join(METHOD, "VERSION")).strip()
     today = datetime.date.today().isoformat()
 
-    os.makedirs(dest, exist_ok=True)
     run(["git", "init", "-q"], cwd=dest)
     run(["git", "symbolic-ref", "HEAD", "refs/heads/knowledge"], cwd=dest)
-    copy_system_layer(dest)
     j = lambda *p: os.path.join(dest, *p)
     write(j("warp.yaml"), warp_yaml(c, version))
-    write(j("warp", "USERS.md"), users_md(c))
-    write(j("warp", "threads", "governance", "MANIFEST.md"), governance_manifest(c, today))
-    write(j("warp", "threads", "governance", "handoff", ".gitkeep"), "")
-    write(j("warp", "index", "THREAD_INDEX.md"), thread_index(c))
-    write(j("warp", "index", "DOCUMENT_INDEX.md"), document_index(c))
-    write(j("warp", "corpus", ".gitkeep"), "")
+    write(j("USERS.md"), users_md(c))
+    write(j("threads", "governance", "MANIFEST.md"), governance_manifest(c, today))
+    write(j("threads", "governance", "handoff", ".gitkeep"), "")
+    write(j("index", "THREAD_INDEX.md"), thread_index(c))
+    write(j("index", "DOCUMENT_INDEX.md"), document_index(c))
+    write(j("corpus", ".gitkeep"), "")
     write(j("AGENTS.md"), agents_md(dest))
     write(j(".claude", "settings.json"), json.dumps(SETTINGS, indent=2, ensure_ascii=False) + "\n")
     write(j("warp.lock"), lock_text(dest, version))
@@ -358,8 +386,8 @@ def cmd_init(args):
     remote = ("y crear el repositorio %s %s/%s en GitHub" %
               ("privado" if c["visibility"] == "private" else "PÚBLICO", c["owner"], c["repo"])
               if c["create_remote"] else "(sin repositorio remoto)")
-    print("\nSi el mensaje es correcto, confirma con:\n\n    python warp/scripts/warp.py publish %s\n\n"
-          "para hacer el commit %s." % (dest, remote))
+    print("\nSi el mensaje es correcto, confirma desde la carpeta del proyecto con:\n\n"
+          "    python warp/scripts/warp.py publish\n\npara hacer el commit %s." % remote)
     return code
 
 
@@ -420,8 +448,12 @@ def cmd_publish(args):
 def main(argv):
     parser = argparse.ArgumentParser(prog="warp.py", description="Instalador de Warp.")
     sub = parser.add_subparsers(dest="command", required=True)
-    p_init = sub.add_parser("init", help="prepara una instancia en local, sin commit")
-    p_init.add_argument("destino")
+    p_init = sub.add_parser(
+        "init", help="prepara la instancia en la carpeta del proyecto, sin commit",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="Formato del archivo --config (layout, enforcement y visibility son opcionales;\n"
+               "por defecto knowledge-only, advisory y private):\n\n" + CONFIG_EXAMPLE)
+    p_init.add_argument("destino", nargs="?", help="carpeta del proyecto (por defecto, la actual)")
     p_init.add_argument("--config", help="archivo JSON con los datos de la instalación")
     p_pub = sub.add_parser("publish", help="hace el commit inicial y, si se pidió, crea el remoto")
     p_pub.add_argument("destino", nargs="?")
