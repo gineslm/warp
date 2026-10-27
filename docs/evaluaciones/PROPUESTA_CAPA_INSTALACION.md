@@ -3,6 +3,7 @@
 **Fecha:** 2026-10-27
 **Estado:** propuesta. Fuera del core; no es metodología vigente. Se promueve a `warp/core/` y a la raíz cuando se construya.
 **Origen:** decisiones tomadas al evaluar `EVALUACION_2026-10-27.md` (§4.20 y revisiones posteriores).
+**Promovido al core:** estructura `warp/` (arquitectura 2.2.0); rama `knowledge` y `layout`, THREAD `governance`, categorías de archivo, `warp.yaml` y `warp/USERS.md` (arquitectura 2.3.0, §3, §4.4 y §16). `USERS.md` se adoptó con formato de **tabla**, no de bloque YAML (§7 de esta propuesta). La forma vigente es la del core.
 
 ---
 

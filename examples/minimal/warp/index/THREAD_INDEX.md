@@ -12,6 +12,7 @@ Artefacto derivado y no autoritativo de descubrimiento. Se reconstruye desde los
 
 | thread_id | status | domain | responsibility | MANIFEST | HANDOFF |
 |---|---|---|---|---|---|
+| `governance` | `ACTIVE` | `gobierno del proyecto` | `Configuración del sistema Warp en el proyecto y sus participantes.` | `warp/threads/governance/MANIFEST.md` | `warp/threads/governance/HANDOFF.md` |
 | `example-notes` | `ACTIVE` | `ejemplo de uso de la metodología Warp` | `THREAD de ejemplo, genérico e inventado, para ilustrar MANIFEST + HANDOFF.` | `warp/threads/example-notes/MANIFEST.md` | `warp/threads/example-notes/HANDOFF.md` |
 
 ## Mantenimiento

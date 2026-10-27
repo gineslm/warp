@@ -1,9 +1,8 @@
 # Warp — Bootstrap de contexto de THREADs
 
-**Versión:** 2.1.1  
+**Versión:** 2.1.2  
 **Estado:** Activo  
 **Idioma:** español (España)  
-**Repositorio:** `tu-organización/tu-repositorio`  
 **Rama raíz de conocimiento:** `knowledge`
 
 ## 1. Propósito
@@ -188,7 +187,7 @@ El checker no juzga significado, calidad de responsabilidad, oportunidad de una 
 
 ## 13. Versión compacta
 
-> Trabaja contra `tu-organización/tu-repositorio`. Entra por `knowledge` y lee primero `PROJECT_AGENT_CONTEXT.md`. Usa los índices para localizar THREAD y documentos, conéctate mediante el MANIFEST, consulta el HANDOFF sólo como cola inter-THREAD pendiente y lee el corpus necesario. Para operaciones estructurales carga las reglas adicionales indicadas en la tabla de divulgación progresiva y ejecuta `warp/scripts/check_knowledge.py` cuando corresponda.
+> Trabaja contra el repositorio declarado en `warp.yaml`. Entra por `knowledge` y lee primero `PROJECT_AGENT_CONTEXT.md`. Usa los índices para localizar THREAD y documentos, conéctate mediante el MANIFEST, consulta el HANDOFF sólo como cola inter-THREAD pendiente y lee el corpus necesario. Para operaciones estructurales carga las reglas adicionales indicadas en la tabla de divulgación progresiva y ejecuta `warp/scripts/check_knowledge.py` cuando corresponda.
 
 ## 14. Historial
 
@@ -197,3 +196,4 @@ El checker no juzga significado, calidad de responsabilidad, oportunidad de una 
 | 2.0.0 | 2026-09-08 | Bootstrap consolidado conforme al modelo persistente de HANDOFF e índices materializados separados. |
 | 2.1.0 | 2026-09-08 | Se adopta divulgación progresiva y se elimina la lectura obligatoria de arquitectura/reglas completas en el caso ordinario. |
 | 2.1.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |
+| 2.1.2 | 2026-10-27 | Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |

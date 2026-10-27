@@ -19,6 +19,12 @@ SPECIAL = {"requirements.txt", ".env", ".env.example", "Dockerfile"}
 SKIP = {".git", "data", "results", "__pycache__", ".pytest_cache"}
 REF_EXTS = {"md", "py", "csv", "json", "yml", "yaml", "txt", "toml"}
 MAX_SCAN = 2_000_000
+LAYOUTS = {"knowledge-only", "with-code"}
+USER_STATUS = {"active", "inactive"}
+GOVERNANCE = "governance"
+CONFIG_DOCS = {"warp.yaml", "warp/USERS.md"}
+CORPUS = "warp/corpus/"
+PLACEHOLDERS = {".gitkeep"}
 SECRETS = [
     ("GitHub token", re.compile(r"gh[pousr]_[A-Za-z0-9]{30,}")),
     ("GitHub PAT", re.compile(r"github_pat_[A-Za-z0-9_]{30,}")),
@@ -72,7 +78,7 @@ def ref_base(root, token):
 def find_root(start):
     p = os.path.abspath(start)
     while True:
-        if os.path.isfile(os.path.join(p, "warp", "index", "THREAD_INDEX.md")):
+        if os.path.isfile(os.path.join(p, "warp.yaml")):
             return p
         q = os.path.dirname(p)
         if q == p: return None
@@ -88,7 +94,7 @@ def yaml_block(text):
         indent = len(raw) - len(raw.lstrip())
         key, sep, val = raw.strip().partition(":")
         if not sep: continue
-        val = val.strip()
+        val = re.sub(r"\s+#.*$", "", val).strip()
         if indent == 0:
             out[key] = {} if not val else val
             parent = key if not val else None
@@ -136,7 +142,7 @@ def authority_paths(text):
     body = section(text, "Autoridad documental vigente")
     if body is None: return set(), False
     return {x.strip() for x in re.findall(r"`([^`]+)`", body)
-            if "/" in x or x.endswith(".md")}, True
+            if "/" in x or "." in x}, True
 
 
 def check_threads(root, rep):
@@ -247,6 +253,9 @@ def check_document_index(root, rep, ids, data, texts):
                         ("path", "authority_thread", "authority_manifest")]
         if doc in seen: rep.error("DOCUMENT_INDEX.md: duplicado '%s'." % doc)
         seen.add(doc)
+        if not doc.startswith(CORPUS):
+            rep.error("DOCUMENT_INDEX.md: '%s' no pertenece al corpus (%s)." %
+                      (doc, CORPUS))
         if not os.path.isfile(os.path.join(root, doc)):
             rep.error("DOCUMENT_INDEX.md: documento inexistente '%s'." % doc)
         if tid not in ids:
@@ -262,6 +271,68 @@ def check_document_index(root, rep, ids, data, texts):
         elif doc not in paths:
             rep.error("DOCUMENT_INDEX.md: '%s' no está bajo autoridad en %s." %
                       (doc, mp))
+    corpus = os.path.join(root, *CORPUS.split("/"))
+    for base, dirs, files in os.walk(corpus):
+        for f in files:
+            doc = rel(root, os.path.join(base, f))
+            if f not in PLACEHOLDERS and doc not in seen:
+                rep.error("DOCUMENT_INDEX.md: falta el documento del corpus '%s'." % doc)
+
+
+def check_config(root, rep):
+    y = yaml_block("```yaml\n" + read(os.path.join(root, "warp.yaml")) + "\n```") or {}
+    if not re.fullmatch(r"\d+\.\d+\.\d+", y.get("warp_version") or ""):
+        rep.error("warp.yaml: warp_version debe ser una versión X.Y.Z.")
+    project = y.get("project")
+    for k in ("name", "repository", "language"):
+        if not isinstance(project, dict) or not project.get(k):
+            rep.error("warp.yaml: falta project.%s." % k)
+    if y.get("layout") not in LAYOUTS:
+        rep.error("warp.yaml: layout '%s' no válido." % y.get("layout"))
+    p = os.path.join(root, "warp", "USERS.md")
+    if not os.path.isfile(p):
+        rep.error("Falta warp/USERS.md."); return
+    target = None
+    for head, rows in tables(read(p)):
+        low = [x.lower() for x in head]
+        if {"github", "name", "status"} <= set(low):
+            target = low, rows; break
+    if not target:
+        rep.error("USERS.md: falta tabla canónica."); return
+    head, rows = target
+    ix = {k: head.index(k) for k in ("github", "status")}
+    seen, active = set(), 0
+    for r in rows:
+        if len(r) <= max(ix.values()): continue
+        gh, st = clean(r[ix["github"]]), clean(r[ix["status"]])
+        if gh in seen: rep.error("USERS.md: github duplicado '%s'." % gh)
+        seen.add(gh)
+        if st not in USER_STATUS:
+            rep.error("USERS.md: status '%s' no válido para '%s'." % (st, gh))
+        active += st == "active"
+    if not active:
+        rep.error("USERS.md: no hay ningún participante active.")
+
+
+def check_governance(rep, data, texts):
+    gov = [mp for mp, y in data.items() if y.get("thread_id") == GOVERNANCE]
+    if len(gov) != 1:
+        rep.error("Debe existir exactamente un THREAD '%s' (hay %d)." %
+                  (GOVERNANCE, len(gov)))
+    for mp, y in data.items():
+        paths, _ = authority_paths(texts[mp])
+        if y.get("thread_id") == GOVERNANCE:
+            if y.get("status") in {"CLOSED", "ARCHIVED"}:
+                rep.error("%s: el THREAD governance no puede estar %s." %
+                          (mp, y.get("status")))
+            for doc in sorted(CONFIG_DOCS - paths):
+                rep.error("%s: governance debe tener autoridad sobre '%s'." % (mp, doc))
+            for doc in sorted(x for x in paths if x.startswith(CORPUS)):
+                rep.warn("%s: governance no gobierna el corpus ('%s')." % (mp, doc))
+        else:
+            for doc in sorted(paths & CONFIG_DOCS):
+                rep.error("%s: '%s' es configuración del proyecto y pertenece a governance." %
+                          (mp, doc))
 
 
 def check_handoffs(root, rep, ids, data):
@@ -337,10 +408,12 @@ def check_secrets(root, rep):
 def main(argv):
     root = find_root(argv[1] if len(argv) > 1 else os.getcwd())
     if not root:
-        print("No se encontró una instancia Warp (warp/index/THREAD_INDEX.md)."); return 2
+        print("No se encontró una instancia Warp (warp.yaml)."); return 2
     print("Comprobando coherencia del conocimiento en: %s" % root)
     rep = Report()
+    check_config(root, rep)
     ids, mpaths, data, texts = check_threads(root, rep)
+    check_governance(rep, data, texts)
     check_thread_index(root, rep, mpaths, data)
     check_document_index(root, rep, ids, data, texts)
     check_handoffs(root, rep, ids, data)

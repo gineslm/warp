@@ -108,6 +108,72 @@ class CheckKnowledge(unittest.TestCase):
         code, out = self.run_checker(self.tmp)
         self.assertEqual(code, 2, out)
 
+    def assert_error(self, fragment):
+        code, out = self.run_checker()
+        self.assertEqual(code, 1, out)
+        self.assertIn(fragment, out)
+
+    def test_layout_no_valido(self):
+        self.replace("warp.yaml", "layout: knowledge-only", "layout: mixto")
+        self.assert_error("layout 'mixto' no válido")
+
+    def test_warp_yaml_sin_campo_de_proyecto(self):
+        self.replace("warp.yaml", "  repository: ejemplo/warp-minimal\n", "")
+        self.assert_error("falta project.repository")
+
+    def test_usuario_con_status_no_valido(self):
+        self.replace(os.path.join("warp", "USERS.md"), "| `active` |", "| `baja` |")
+        self.assert_error("status 'baja' no válido")
+
+    def test_usuario_duplicado(self):
+        row = "| `usuario-ejemplo` | `Persona de ejemplo` | `active` |\n"
+        self.replace(os.path.join("warp", "USERS.md"), row, row + row)
+        self.assert_error("github duplicado 'usuario-ejemplo'")
+
+    def test_sin_participantes_activos(self):
+        self.replace(os.path.join("warp", "USERS.md"), "| `active` |", "| `inactive` |")
+        self.assert_error("no hay ningún participante active")
+
+    def test_falta_governance(self):
+        shutil.rmtree(os.path.join(self.root, "warp", "threads", "governance"))
+        self.replace(os.path.join("warp", "index", "THREAD_INDEX.md"),
+                     "| `governance` |", "| `x` |")
+        self.assert_error("exactamente un THREAD 'governance' (hay 0)")
+
+    def test_governance_archivado(self):
+        gov = os.path.join("warp", "threads", "governance", "MANIFEST.md")
+        self.replace(gov, "status: ACTIVE", "status: ARCHIVED")
+        self.replace(os.path.join("warp", "index", "THREAD_INDEX.md"),
+                     "| `governance` | `ACTIVE` |", "| `governance` | `ARCHIVED` |")
+        self.assert_error("governance no puede estar ARCHIVED")
+
+    def test_governance_sin_autoridad_sobre_users(self):
+        self.replace(os.path.join("warp", "threads", "governance", "MANIFEST.md"),
+                     "- `warp/USERS.md`\n", "")
+        self.assert_error("governance debe tener autoridad sobre 'warp/USERS.md'")
+
+    def test_otro_hilo_reclama_configuracion(self):
+        self.replace(os.path.join(THREAD, "MANIFEST.md"),
+                     "- `warp/corpus/NOTES.md`\n",
+                     "- `warp/corpus/NOTES.md`\n- `warp.yaml`\n")
+        self.assert_error("'warp.yaml' es configuración del proyecto")
+
+    def test_documento_del_corpus_sin_indexar(self):
+        with open(os.path.join(self.root, "warp", "corpus", "HUERFANO.md"), "w",
+                  encoding="utf-8") as f:
+            f.write("# huérfano\n")
+        self.assert_error("falta el documento del corpus 'warp/corpus/HUERFANO.md'")
+
+    def test_gitkeep_en_el_corpus_no_es_un_documento(self):
+        open(os.path.join(self.root, "warp", "corpus", ".gitkeep"), "w").close()
+        code, out = self.run_checker()
+        self.assertEqual(code, 0, out)
+
+    def test_documento_index_fuera_del_corpus(self):
+        self.replace(os.path.join("warp", "index", "DOCUMENT_INDEX.md"),
+                     "| `warp/corpus/NOTES.md` |", "| `warp/USERS.md` |")
+        self.assert_error("'warp/USERS.md' no pertenece al corpus")
+
 
 if __name__ == "__main__":
     unittest.main()

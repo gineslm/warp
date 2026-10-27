@@ -553,11 +553,16 @@ Las líneas futuras quedan fuera del core actual:
 │
 ├── examples/
 │   └── minimal/                   # instancia de ejemplo
+│       ├── warp.yaml
 │       └── warp/
+│           ├── USERS.md
 │           ├── index/
 │           │   ├── THREAD_INDEX.md
 │           │   └── DOCUMENT_INDEX.md
 │           ├── threads/
+│           │   ├── governance/
+│           │   │   ├── MANIFEST.md
+│           │   │   └── HANDOFF.md
 │           │   └── example-notes/
 │           │       ├── MANIFEST.md
 │           │       └── HANDOFF.md

@@ -1,9 +1,8 @@
 # Warp — Arquitectura de THREADs y conocimiento
 
-**Versión:** 2.2.0  
+**Versión:** 2.3.0  
 **Estado:** Especificación operativa  
 **Idioma:** español (España)  
-**Repositorio:** `tu-organización/tu-repositorio`  
 **Rama raíz de conocimiento:** `knowledge`
 
 ## 1. Propósito
@@ -29,17 +28,11 @@ El sistema está diseñado para potenciar trabajo y validación humana, no para 
 11. Una propuesta no es una decisión ni una dependencia por el mero hecho de existir.
 12. El proyecto es un sistema híbrido: el agente ayuda a investigar, estructurar, contrastar y registrar; la validación y las decisiones permanecen gobernadas por la responsabilidad correspondiente.
 
-## 3. Ramas del proyecto
+## 3. Ramas
 
-```text
-knowledge → conocimiento y estructura consolidados
-develop   → integración del software
-main      → software estable/desplegable
-```
+Warp sólo exige una rama: **`knowledge`**.
 
-### `knowledge`
-
-Es la raíz de bootstrap y la referencia autoritativa para:
+`knowledge` tiene **árbol propio**: contiene únicamente la capa Warp de la instancia y no comparte historia con el código del proyecto, si lo hay. Es la raíz de bootstrap y la referencia autoritativa para:
 
 - arquitectura y reglas;
 - THREADs, MANIFESTs y HANDOFFs;
@@ -47,11 +40,14 @@ Es la raíz de bootstrap y la referencia autoritativa para:
 - documentos de conocimiento;
 - decisiones consolidadas.
 
-### `develop` y `main`
+El parámetro `layout` de `warp.yaml` (§16.2) declara si el repositorio contiene también software:
 
-Pertenecen al ciclo del software. Una implementación puede fijar explícitamente una base histórica de conocimiento mediante un SHA cuando sea necesario para reproducibilidad.
+- **`knowledge-only`**: `knowledge` es la rama principal del repositorio y no existen ramas de software.
+- **`with-code`**: las ramas del software (`main`, `develop`…) pertenecen a su propio ciclo y al equipo que lo desarrolla. **`knowledge` nunca se fusiona en ellas.** Una implementación puede fijar una base de conocimiento mediante un SHA de `knowledge` cuando lo necesite para reproducibilidad.
 
-Las ramas de trabajo (`agent/*`, `feature/*`, etc.) son espacios operativos y nunca sustituyen a `knowledge` como fuente global de verdad.
+Leer el corpus desde el código es libre y no exige conectarse a ningún THREAD.
+
+Las ramas de trabajo (`agent/*`) nacen de `knowledge`. Son espacios operativos y nunca sustituyen a `knowledge` como fuente global de verdad.
 
 ## 4. THREAD
 
@@ -103,6 +99,18 @@ ARCHIVED
 ```
 
 No existe `READY_FOR_HANDOFF`: el HANDOFF no representa una transferencia.
+
+### 4.4 THREAD de gobierno
+
+Toda instancia tiene exactamente un THREAD con `thread_id: governance`.
+
+Su responsabilidad es la configuración del sistema Warp en el proyecto y sus participantes. Tiene autoridad sobre la configuración del proyecto (§16.1): `warp.yaml`, `warp/USERS.md` y la configuración de agentes y de CI que exista en `knowledge`. No gobierna el contenido del corpus: los documentos transversales del corpus siguen el §11.3.
+
+No puede estar `CLOSED` ni `ARCHIVED` mientras exista la instancia.
+
+No es un tipo de THREAD: es un THREAD ordinario con un identificador reservado. La taxonomía de THREADs sigue abierta (§17).
+
+Si su responsable deja de estar disponible y nadie dentro del modelo puede reasignarlo, el último recurso es la administración del repositorio, fuera de Warp.
 
 ## 5. Alta de un THREAD
 
@@ -354,6 +362,8 @@ Descubre:
 - THREAD con autoridad;
 - MANIFEST que permite verificarla.
 
+Lista exclusivamente los documentos del corpus (`warp/corpus/`). Todo documento del corpus figura en él. La configuración del proyecto, el método y los artefactos de THREAD no se listan (§16.1).
+
 Forma canónica: `warp/core/DOCUMENT_INDEX_TEMPLATE.md`.
 
 Los índices no son un segundo corpus ni una segunda fuente de verdad.
@@ -379,6 +389,8 @@ No se mantienen registros paralelos de decisiones terminadas salvo que documente
 | superficie mínima del agente | `PROJECT_AGENT_CONTEXT.md` |
 | bootstrap detallado | `THREAD_CONTEXT_BOOTSTRAP.md` |
 | estrategia Git | `GIT_COMMIT_RULES.md` |
+| configuración del proyecto | `warp.yaml` |
+| participantes | `warp/USERS.md` |
 | identidad/estado de THREAD | MANIFEST |
 | inputs pendientes | HANDOFF |
 | descubrimiento de THREADs | `THREAD_INDEX.md` (derivado) |
@@ -386,8 +398,7 @@ No se mantienen registros paralelos de decisiones terminadas salvo que documente
 | validación estructural | `warp/scripts/check_knowledge.py` |
 | conocimiento vigente | documentos del corpus |
 | historial de decisiones/evolución | Git |
-| software en integración | `develop` |
-| software estable | `main` |
+| software, si existe | sus propias ramas (§3) |
 
 ## 15. Cierre de un THREAD
 
@@ -404,23 +415,65 @@ Antes de cerrar:
 
 El THREAD cerrado mantiene su MANIFEST y su HANDOFF persistente. El HANDOFF puede quedar vacío/cerrado y las nuevas propuestas deben dirigirse a la responsabilidad sucesora cuando exista.
 
-## 16. Disposición física actual
+## 16. Disposición física y capas
 
-Todo Warp vive bajo un único espacio de nombres `warp/`:
+Todo Warp vive en la rama `knowledge`, bajo el espacio de nombres `warp/`, salvo los archivos que las herramientas exigen en la raíz:
 
 ```text
+warp.yaml               configuración del proyecto
+(configuración de agentes y CI, p. ej. AGENTS.md, .claude/, .github/)
 warp/
 ├── core/               método: arquitectura, reglas, bootstrap, plantillas
 ├── scripts/            herramientas: comprobador estructural
 ├── index/              índices derivados (THREAD_INDEX.md, DOCUMENT_INDEX.md)
 ├── threads/
 │   └── <thread_id>/    artefactos operativos: MANIFEST.md, HANDOFF.md
-└── corpus/             documentos de conocimiento, organizados por tema
+├── corpus/             documentos de conocimiento, organizados por tema
+└── USERS.md            participantes del proyecto
 ```
 
 La ubicación física no determina la autoridad documental: la declara el MANIFEST del THREAD responsable y la muestra `warp/index/DOCUMENT_INDEX.md`.
 
 Los artefactos operativos de un THREAD se nombran por rol (`MANIFEST.md`, `HANDOFF.md`) y viven en `warp/threads/<thread_id>/`. Los documentos de conocimiento viven en `warp/corpus/`, organizados por tema y nunca por THREAD: así se refuerza que no son silos privados, y transferir su autoridad (§11.4) no obliga a moverlos ni rompe sus rutas.
+
+### 16.1 Categorías de archivo
+
+| Categoría | Archivos | Autoridad |
+|---|---|---|
+| **sistema** | método (`warp/core/`) y herramientas (`warp/scripts/`) | ninguna en la instancia: viene de la distribución de Warp, es de solo lectura y solo cambia al actualizar de versión |
+| **derivados** | `warp/index/` | ninguna: se regeneran y nunca se editan a mano |
+| **corpus** | `warp/corpus/` | el THREAD que la declare en su MANIFEST; se descubre en `warp/index/DOCUMENT_INDEX.md` y es transferible (§11.4) |
+| **artefactos de THREAD** | `warp/threads/<thread_id>/` | el propio THREAD; su HANDOFF admite entradas de otros THREADs (§7.2) |
+| **configuración del proyecto** | `warp.yaml`, `warp/USERS.md` y la configuración de agentes y CI | el THREAD `governance` (§4.4) |
+
+La regla de autoridad única (§11.2) se cumple en las tres últimas categorías, cada una con su forma de asignarla.
+
+Los documentos del método no forman parte del corpus ni figuran en `DOCUMENT_INDEX.md`: el corpus es el conocimiento del proyecto, y el método es la forma de gestionarlo. Las mejoras al método no se proponen en un HANDOFF: se proponen a la distribución de Warp.
+
+### 16.2 `warp.yaml`
+
+```yaml
+warp_version: 2.3.0          # versión del método
+project:
+  name: <nombre>
+  repository: <organización/repositorio>
+  language: es-ES
+layout: knowledge-only       # knowledge-only | with-code
+```
+
+El nombre de la rama de conocimiento no es configurable: es `knowledge`.
+
+### 16.3 `warp/USERS.md`
+
+Lista de participantes del proyecto. Forma canónica: `warp/core/USERS_TEMPLATE.md`.
+
+| github | name | status |
+|---|---|---|
+| `<usuario>` | `<nombre visible>` | `active` |
+
+- `status` vale `active` o `inactive`. Quien deja el proyecto se marca `inactive` y no se borra, para que las referencias históricas sigan siendo válidas.
+- No se registran emails ni otros datos personales: Git conserva para siempre lo que pasa por él.
+- Los campos de roles no se incorporan hasta que la arquitectura los defina.
 
 ## 17. Cuestiones abiertas
 
@@ -441,3 +494,4 @@ La arquitectura considera abiertas únicamente cuestiones que no alteran las inv
 | 2.0.2 | 2026-09-08 | Se alinea el contrato del MANIFEST: identidad estructurada en YAML y responsabilidad obligatoria como sección Markdown no duplicada. |
 | 2.1.0 | 2026-09-08 | Se adopta divulgación progresiva: el agente carga una superficie mínima por defecto y consulta arquitectura/reglas completas sólo según la operación, apoyado por validación estructural automática. |
 | 2.2.0 | 2026-10-27 | Todo Warp pasa al espacio de nombres `warp/`; el corpus vive en `warp/corpus/`, separado de los THREADs y organizado por tema, para que transferir autoridad no mueva documentos. |
+| 2.3.0 | 2026-10-27 | `knowledge` como única rama exigida, con árbol propio y `layout`; THREAD `governance`; cinco categorías de archivo; `warp.yaml` y `warp/USERS.md`; `DOCUMENT_INDEX` limitado al corpus; los datos del proyecto salen del core. |
