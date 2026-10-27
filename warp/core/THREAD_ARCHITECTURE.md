@@ -1,6 +1,6 @@
 # Warp — Arquitectura de THREADs y conocimiento
 
-**Versión:** 2.8.0  
+**Versión:** 2.9.0  
 **Estado:** Especificación operativa  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -302,7 +302,7 @@ Antes de crear o resolver una entrada HANDOFF se cargan las reglas específicas 
 
 Una **tarea** es una unidad de trabajo con un resultado concreto dentro de un THREAD: resolver una entrada de su buzón, o desarrollar un documento o una decisión propios.
 
-- Cada tarea se trabaja en una rama `agent/<thread_id>/<tarea>`, nacida de `knowledge`. Una tarea tiene como máximo **una rama activa**.
+- Cada tarea se trabaja en una rama `agent/<thread_id>/<tarea>`, nacida de `knowledge`, y su PR se dirige siempre a `knowledge`, aunque la rama principal del repositorio sea otra (`layout: with-code`). Una tarea tiene como máximo **una rama activa**.
 - Si la tarea **resuelve una entrada**, `<tarea>` es el nombre del archivo de la entrada sin extensión, por ejemplo `agent/ing-frontend/formulario-pago-un-paso`. Así cualquiera puede comprobar si una entrada ya se está trabajando.
 - Si la tarea **desarrolla documentos propios**, `<tarea>` es un nombre descriptivo, y el PR declara en su descripción los documentos que toca.
 - **Antes de empezar**, se comprueba si ya existe una rama, local o remota, o un PR abierto para esa tarea. Si es el mismo trabajo, se retoma; si es un aporte distinto, se abre otra tarea.
@@ -481,7 +481,7 @@ Los documentos del método no forman parte del corpus ni figuran en `DOCUMENT_IN
 ### 16.2 `warp.yaml`
 
 ```yaml
-warp_version: 2.8.0          # versión del método
+warp_version: 2.9.0          # versión del método
 project:
   name: <nombre>
   repository: <organización/repositorio>
@@ -531,3 +531,4 @@ La arquitectura considera abiertas únicamente cuestiones que no alteran las inv
 | 2.6.0 | 2026-10-27 | §9.4 tareas y ramas de trabajo: una rama activa por tarea, nombre de la tarea igual al de la entrada que resuelve, una instancia por THREAD y directorios de trabajo separados; subsecciones del §9 numeradas. |
 | 2.7.0 | 2026-10-27 | §13: la decisión es el guardado de unión en `knowledge` y la rama conserva la deliberación. |
 | 2.8.0 | 2026-10-27 | El principio 1 excluye como fuente de verdad cualquier memoria externa al repositorio. |
+| 2.9.0 | 2026-10-27 | §9.4: el PR de una tarea se dirige siempre a `knowledge`. Entrada para agentes en `AGENTS.md` (plantilla `AGENTS_TEMPLATE.md`). |
