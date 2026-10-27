@@ -1,6 +1,6 @@
 # Warp — Contexto mínimo del proyecto para agentes
 
-**Versión:** 2.2.0  
+**Versión:** 2.3.0  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -15,7 +15,7 @@ La conversación/agente es temporal. El repositorio es la memoria duradera.
 
 1. Un THREAD existe si y sólo si existe su MANIFEST en `knowledge`.
 2. El agente se incorpora a un THREAD mediante su MANIFEST.
-3. El corpus es global para lectura; un THREAD sólo modifica documentos bajo su autoridad.
+3. El corpus es global para lectura; un THREAD sólo modifica documentos bajo su autoridad. Cualquier participante activo puede trabajar en cualquier THREAD; integrar en `knowledge` requiere al `owner` del THREAD o su aprobación.
 4. Para cambiar conocimiento bajo autoridad ajena se registra un input en el HANDOFF del THREAD responsable.
 5. El HANDOFF contiene exclusivamente inputs pendientes procedentes de **otros THREADs**; el trabajo propio no se encola.
 6. Una entrada resuelta sale del HANDOFF en el mismo commit que aplica o registra la decisión; Git conserva el historial.
@@ -135,3 +135,4 @@ Antes de terminar:
 | 2.1.0 | 2026-09-08 | Se adopta divulgación progresiva: el agente carga por defecto sólo el contexto mínimo y consulta arquitectura/reglas completas según la operación. |
 | 2.1.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |
 | 2.2.0 | 2026-10-27 | Nueva entrada en «Cuándo leer más» para la configuración del proyecto (THREAD `governance`); `warp.yaml` y `warp/USERS.md` entre las fuentes. Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |
+| 2.3.0 | 2026-10-27 | La regla dura 3 incorpora el modelo de participación: cualquier participante activo trabaja; integrar requiere al `owner` o su aprobación. |

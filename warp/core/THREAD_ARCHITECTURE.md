@@ -1,6 +1,6 @@
 # Warp — Arquitectura de THREADs y conocimiento
 
-**Versión:** 2.3.0  
+**Versión:** 2.4.0  
 **Estado:** Especificación operativa  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -74,6 +74,8 @@ Además, todo MANIFEST debe contener una sección `## Responsabilidad` no vacía
 
 `thread_id` permanece estable durante la vida del THREAD.
 
+`owner` es el `github` de una persona listada en `warp/USERS.md` (§16.3). Un agente nunca es `owner`. Mientras el THREAD no esté `CLOSED` ni `ARCHIVED`, su `owner` debe estar `active`.
+
 ### 4.2 Origen
 
 ```yaml
@@ -111,6 +113,22 @@ No puede estar `CLOSED` ni `ARCHIVED` mientras exista la instancia.
 No es un tipo de THREAD: es un THREAD ordinario con un identificador reservado. La taxonomía de THREADs sigue abierta (§17).
 
 Si su responsable deja de estar disponible y nadie dentro del modelo puede reasignarlo, el último recurso es la administración del repositorio, fuera de Warp.
+
+### 4.5 Responsable y participación
+
+Un THREAD tiene un único responsable, su `owner`, y puede tener muchos contribuidores.
+
+| Acción | Quién |
+|---|---|
+| Leer el corpus y conectar un agente a cualquier THREAD | cualquiera |
+| Trabajar en una rama del THREAD | cualquier participante `active` |
+| Registrar una entrada en el HANDOFF de otro THREAD | cualquier THREAD (§7.2) |
+| Integrar en `knowledge` cambios bajo autoridad del THREAD | su `owner`, o cualquier participante con aprobación del `owner` |
+| Cambiar el `owner` | el `owner` actual, o el `owner` de `governance` |
+
+- La responsabilidad se ejerce al **integrar**, no al conectarse ni al trabajar. No existe una lista de miembros por THREAD.
+- El usuario de GitHub sirve para comprobar autoría y aprobación. Quién puede subir ramas lo deciden los permisos del repositorio.
+- La autoridad única por documento entre THREADs (§11.2) no cambia: para modificar conocimiento de otro THREAD se sigue proponiendo en su HANDOFF.
 
 ## 5. Alta de un THREAD
 
@@ -453,15 +471,18 @@ Los documentos del método no forman parte del corpus ni figuran en `DOCUMENT_IN
 ### 16.2 `warp.yaml`
 
 ```yaml
-warp_version: 2.3.0          # versión del método
+warp_version: 2.4.0          # versión del método
 project:
   name: <nombre>
   repository: <organización/repositorio>
   language: es-ES
 layout: knowledge-only       # knowledge-only | with-code
+enforcement: advisory        # advisory | strict
 ```
 
 El nombre de la rama de conocimiento no es configurable: es `knowledge`.
+
+`enforcement` regula solo las comprobaciones sobre **personas**: que el `owner` sea un participante activo y que la integración la haga o la apruebe el `owner` (§4.5). Con `advisory` son avisos; con `strict`, errores y requisito de merge. Las invariantes estructurales son siempre errores. En repos privados, hacer `strict` obligatorio en GitHub requiere un plan con protección de ramas.
 
 ### 16.3 `warp/USERS.md`
 
@@ -495,3 +516,4 @@ La arquitectura considera abiertas únicamente cuestiones que no alteran las inv
 | 2.1.0 | 2026-09-08 | Se adopta divulgación progresiva: el agente carga una superficie mínima por defecto y consulta arquitectura/reglas completas sólo según la operación, apoyado por validación estructural automática. |
 | 2.2.0 | 2026-10-27 | Todo Warp pasa al espacio de nombres `warp/`; el corpus vive en `warp/corpus/`, separado de los THREADs y organizado por tema, para que transferir autoridad no mueva documentos. |
 | 2.3.0 | 2026-10-27 | `knowledge` como única rama exigida, con árbol propio y `layout`; THREAD `governance`; cinco categorías de archivo; `warp.yaml` y `warp/USERS.md`; `DOCUMENT_INDEX` limitado al corpus; los datos del proyecto salen del core. |
+| 2.4.0 | 2026-10-27 | `owner` es un participante de `warp/USERS.md`, nunca un agente; §4.5 separa leer, trabajar e integrar, y la responsabilidad se ejerce al integrar; `enforcement` en `warp.yaml`. |

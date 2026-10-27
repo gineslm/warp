@@ -169,6 +169,46 @@ class CheckKnowledge(unittest.TestCase):
         code, out = self.run_checker()
         self.assertEqual(code, 0, out)
 
+    def test_enforcement_no_valido(self):
+        self.replace("warp.yaml", "enforcement: advisory", "enforcement: total")
+        self.assert_error("enforcement 'total' no válido")
+
+    def test_owner_desconocido_advisory_avisa(self):
+        self.replace(os.path.join(THREAD, "MANIFEST.md"),
+                     "owner: usuario-ejemplo", "owner: alguien")
+        code, out = self.run_checker()
+        self.assertEqual(code, 0, out)
+        self.assertIn("[WARN]  warp/threads/example-notes/MANIFEST.md: owner 'alguien' no figura", out)
+
+    def test_owner_desconocido_strict_falla(self):
+        self.replace("warp.yaml", "enforcement: advisory", "enforcement: strict")
+        self.replace(os.path.join(THREAD, "MANIFEST.md"),
+                     "owner: usuario-ejemplo", "owner: alguien")
+        self.assert_error("owner 'alguien' no figura en warp/USERS.md")
+
+    def add_inactive_user(self):
+        self.replace(os.path.join("warp", "USERS.md"),
+                     "| `usuario-ejemplo` | `Persona de ejemplo` | `active` |\n",
+                     "| `usuario-ejemplo` | `Persona de ejemplo` | `active` |\n"
+                     "| `antiguo` | `Persona que se fue` | `inactive` |\n")
+        self.replace(os.path.join(THREAD, "MANIFEST.md"),
+                     "owner: usuario-ejemplo", "owner: antiguo")
+
+    def test_owner_inactivo_en_hilo_activo(self):
+        self.replace("warp.yaml", "enforcement: advisory", "enforcement: strict")
+        self.add_inactive_user()
+        self.assert_error("owner 'antiguo' no está active")
+
+    def test_owner_inactivo_en_hilo_archivado_es_valido(self):
+        self.replace("warp.yaml", "enforcement: advisory", "enforcement: strict")
+        self.add_inactive_user()
+        self.replace(os.path.join(THREAD, "MANIFEST.md"),
+                     "status: ACTIVE", "status: ARCHIVED")
+        self.replace(os.path.join("warp", "index", "THREAD_INDEX.md"),
+                     "| `example-notes` | `ACTIVE` |", "| `example-notes` | `ARCHIVED` |")
+        code, out = self.run_checker()
+        self.assertEqual(code, 0, out)
+
     def test_documento_index_fuera_del_corpus(self):
         self.replace(os.path.join("warp", "index", "DOCUMENT_INDEX.md"),
                      "| `warp/corpus/NOTES.md` |", "| `warp/USERS.md` |")
