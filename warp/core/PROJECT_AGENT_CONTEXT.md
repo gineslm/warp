@@ -1,6 +1,6 @@
 # Warp — Contexto mínimo del proyecto para agentes
 
-**Versión:** 2.1.0  
+**Versión:** 2.1.1  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Repositorio:** `tu-organización/tu-repositorio`  
@@ -20,7 +20,7 @@ La conversación/agente es temporal. El repositorio es la memoria duradera.
 4. Para cambiar conocimiento bajo autoridad ajena se registra un input en el HANDOFF del THREAD responsable.
 5. El HANDOFF contiene exclusivamente inputs pendientes procedentes de **otros THREADs**; el trabajo propio no se encola.
 6. Una entrada resuelta sale del HANDOFF en el mismo commit que aplica o registra la decisión; Git conserva el historial.
-7. Un commit representa una decisión; antes de guardar cambios se aplica `docs/core/GIT_COMMIT_RULES.md`.
+7. Un commit representa una decisión; antes de guardar cambios se aplica `warp/core/GIT_COMMIT_RULES.md`.
 8. Ninguna llave, token, contraseña o secreto se guarda en archivos versionados.
 
 ## 3. Entrada por defecto
@@ -57,22 +57,22 @@ Para trabajo ordinario dentro de un THREAD ya existente, esta superficie es sufi
 | cerrar, archivar o reabrir un THREAD | `THREAD_ARCHITECTURE.md` §15 y `THREAD_CONTEXT_BOOTSTRAP.md` §10 |
 | cambiar arquitectura, reglas, bootstrap o convenciones del sistema | `THREAD_ARCHITECTURE.md` + `PROJECT_WORKING_RULES.md` completos |
 | guardar cambios | `GIT_COMMIT_RULES.md` |
-| modificar MANIFESTs, HANDOFFs, índices o autoridad documental | además ejecutar `python scripts/check_knowledge.py` antes de consolidar |
+| modificar MANIFESTs, HANDOFFs, índices o autoridad documental | además ejecutar `python warp/scripts/check_knowledge.py` antes de consolidar |
 | trabajar dentro de tu THREAD en documentos bajo su autoridad | nada más: MANIFEST + HANDOFF + corpus relevante bastan |
 
 La divulgación progresiva reduce contexto, pero no reduce autoridad ni obligaciones. Si existe duda sobre una operación, se consulta la fuente canónica extensa antes de actuar.
 
 ## 5. Fuentes canónicas bajo demanda
 
-- Arquitectura: `docs/core/THREAD_ARCHITECTURE.md`.
-- Reglas permanentes: `docs/core/PROJECT_WORKING_RULES.md`.
-- Bootstrap detallado: `docs/core/THREAD_CONTEXT_BOOTSTRAP.md`.
-- Estrategia Git: `docs/core/GIT_COMMIT_RULES.md`.
-- Índice de THREADs: `docs/core/THREAD_INDEX.md`.
-- Índice documental: `docs/core/DOCUMENT_INDEX.md`.
-- Plantilla de índice de THREADs: `docs/core/THREAD_INDEX_TEMPLATE.md`.
-- Plantilla de índice documental: `docs/core/DOCUMENT_INDEX_TEMPLATE.md`.
-- Comprobador estructural: `scripts/check_knowledge.py`.
+- Arquitectura: `warp/core/THREAD_ARCHITECTURE.md`.
+- Reglas permanentes: `warp/core/PROJECT_WORKING_RULES.md`.
+- Bootstrap detallado: `warp/core/THREAD_CONTEXT_BOOTSTRAP.md`.
+- Estrategia Git: `warp/core/GIT_COMMIT_RULES.md`.
+- Índice de THREADs: `warp/index/THREAD_INDEX.md`.
+- Índice documental: `warp/index/DOCUMENT_INDEX.md`.
+- Plantilla de índice de THREADs: `warp/core/THREAD_INDEX_TEMPLATE.md`.
+- Plantilla de índice documental: `warp/core/DOCUMENT_INDEX_TEMPLATE.md`.
+- Comprobador estructural: `warp/scripts/check_knowledge.py`.
 
 ## 6. Comandos de entrada
 
@@ -99,12 +99,12 @@ Reconstruir el estado desde `knowledge`, resolver el THREAD compatible y compara
 
 ## 7. Validación estructural
 
-`scripts/check_knowledge.py` es una red de seguridad determinista para invariantes estructurales. No sustituye criterio humano ni análisis semántico.
+`warp/scripts/check_knowledge.py` es una red de seguridad determinista para invariantes estructurales. No sustituye criterio humano ni análisis semántico.
 
 Ejecutar:
 
 ```text
-python scripts/check_knowledge.py
+python warp/scripts/check_knowledge.py
 ```
 
 antes de consolidar cambios que afecten a MANIFESTs, HANDOFFs, índices, rutas o autoridad documental.
@@ -123,7 +123,7 @@ Antes de terminar:
 
 ## 9. Bloque compacto
 
-> Repositorio: `tu-organización/tu-repositorio`. Fuente de verdad: `knowledge`. Lee primero `docs/core/PROJECT_AGENT_CONTEXT.md`; después usa `THREAD_INDEX.md` / `DOCUMENT_INDEX.md`, conéctate mediante el MANIFEST y consulta el HANDOFF sólo como cola de inputs pendientes procedentes de otros THREADs. Lee el corpus necesario; sólo modifica documentos bajo autoridad de tu THREAD. Para operaciones estructurales o excepcionales, carga las fuentes indicadas en la tabla «Cuándo leer más». Un commit = una decisión y los secretos nunca se versionan.
+> Repositorio: `tu-organización/tu-repositorio`. Fuente de verdad: `knowledge`. Lee primero `warp/core/PROJECT_AGENT_CONTEXT.md`; después usa `THREAD_INDEX.md` / `DOCUMENT_INDEX.md`, conéctate mediante el MANIFEST y consulta el HANDOFF sólo como cola de inputs pendientes procedentes de otros THREADs. Lee el corpus necesario; sólo modifica documentos bajo autoridad de tu THREAD. Para operaciones estructurales o excepcionales, carga las fuentes indicadas en la tabla «Cuándo leer más». Un commit = una decisión y los secretos nunca se versionan.
 
 ## 10. Historial
 
@@ -131,3 +131,4 @@ Antes de terminar:
 |---|---|---|
 | 2.0.0 | 2026-09-08 | Consolidación del contexto de agente conforme al modelo de HANDOFF persistente, índices separados y autoridad documental única. |
 | 2.1.0 | 2026-09-08 | Se adopta divulgación progresiva: el agente carga por defecto sólo el contexto mínimo y consulta arquitectura/reglas completas según la operación. |
+| 2.1.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |

@@ -1,6 +1,6 @@
 # Warp — Arquitectura de THREADs y conocimiento
 
-**Versión:** 2.1.0  
+**Versión:** 2.2.0  
 **Estado:** Especificación operativa  
 **Idioma:** español (España)  
 **Repositorio:** `tu-organización/tu-repositorio`  
@@ -254,7 +254,7 @@ rama de trabajo, si procede
 
 El principio es **divulgación progresiva**: el caso ordinario trabaja con el contrato mínimo; crear/cerrar THREADs, cambiar autoridad documental, operar sobre HANDOFFs, cambiar reglas o consolidar decisiones exige cargar previamente la fuente canónica correspondiente.
 
-La reducción de contexto no reduce obligaciones. Los cambios estructurales se validan con `scripts/check_knowledge.py`, que comprueba invariantes mecánicas sin sustituir el juicio semántico.
+La reducción de contexto no reduce obligaciones. Los cambios estructurales se validan con `warp/scripts/check_knowledge.py`, que comprueba invariantes mecánicas sin sustituir el juicio semántico.
 
 ## 9. Crear, conectar y proponer
 
@@ -329,7 +329,7 @@ Si cambia la responsabilidad:
 
 ### THREAD_INDEX
 
-`docs/core/THREAD_INDEX.md`
+`warp/index/THREAD_INDEX.md`
 
 Descubre:
 
@@ -339,13 +339,13 @@ Descubre:
 - MANIFEST;
 - HANDOFF.
 
-Forma canónica: `docs/core/THREAD_INDEX_TEMPLATE.md`.
+Forma canónica: `warp/core/THREAD_INDEX_TEMPLATE.md`.
 
 La fuente autoritativa son los MANIFESTs.
 
 ### DOCUMENT_INDEX
 
-`docs/core/DOCUMENT_INDEX.md`
+`warp/index/DOCUMENT_INDEX.md`
 
 Descubre:
 
@@ -354,13 +354,13 @@ Descubre:
 - THREAD con autoridad;
 - MANIFEST que permite verificarla.
 
-Forma canónica: `docs/core/DOCUMENT_INDEX_TEMPLATE.md`.
+Forma canónica: `warp/core/DOCUMENT_INDEX_TEMPLATE.md`.
 
 Los índices no son un segundo corpus ni una segunda fuente de verdad.
 
 ## 13. Git y decisiones
 
-La estrategia canónica vive en `docs/core/GIT_COMMIT_RULES.md`.
+La estrategia canónica vive en `warp/core/GIT_COMMIT_RULES.md`.
 
 Principio:
 
@@ -383,7 +383,7 @@ No se mantienen registros paralelos de decisiones terminadas salvo que documente
 | inputs pendientes | HANDOFF |
 | descubrimiento de THREADs | `THREAD_INDEX.md` (derivado) |
 | descubrimiento del corpus/autoridad | `DOCUMENT_INDEX.md` (derivado) |
-| validación estructural | `scripts/check_knowledge.py` |
+| validación estructural | `warp/scripts/check_knowledge.py` |
 | conocimiento vigente | documentos del corpus |
 | historial de decisiones/evolución | Git |
 | software en integración | `develop` |
@@ -399,32 +399,37 @@ Antes de cerrar:
 4. consolidar conocimiento vigente;
 5. transferir explícitamente autoridad documental que no pueda quedar sin responsable;
 6. actualizar MANIFEST e índices;
-7. ejecutar `scripts/check_knowledge.py`;
+7. ejecutar `warp/scripts/check_knowledge.py`;
 8. validar/testear cuando proceda.
 
 El THREAD cerrado mantiene su MANIFEST y su HANDOFF persistente. El HANDOFF puede quedar vacío/cerrado y las nuevas propuestas deben dirigirse a la responsabilidad sucesora cuando exista.
 
 ## 16. Disposición física actual
 
+Todo Warp vive bajo un único espacio de nombres `warp/`:
+
 ```text
-docs/
-├── core/
-│   └── threads/
-└── threads/
+warp/
+├── core/               método: arquitectura, reglas, bootstrap, plantillas
+├── scripts/            herramientas: comprobador estructural
+├── index/              índices derivados (THREAD_INDEX.md, DOCUMENT_INDEX.md)
+├── threads/
+│   └── <thread_id>/    artefactos operativos: MANIFEST.md, HANDOFF.md
+└── corpus/             documentos de conocimiento, organizados por tema
 ```
 
-La ubicación física no determina la autoridad documental. La organización futura del corpus puede evolucionar sin cambiar el principio de corpus común + autoridad única.
+La ubicación física no determina la autoridad documental: la declara el MANIFEST del THREAD responsable y la muestra `warp/index/DOCUMENT_INDEX.md`.
 
-Los artefactos operativos de un THREAD se nombran por rol (`MANIFEST.md`, `HANDOFF.md`). Los documentos de conocimiento pueden estar físicamente próximos al THREAD responsable, pero no se consideran silos privados.
+Los artefactos operativos de un THREAD se nombran por rol (`MANIFEST.md`, `HANDOFF.md`) y viven en `warp/threads/<thread_id>/`. Los documentos de conocimiento viven en `warp/corpus/`, organizados por tema y nunca por THREAD: así se refuerza que no son silos privados, y transferir su autoridad (§11.4) no obliga a moverlos ni rompe sus rutas.
 
 ## 17. Cuestiones abiertas
 
 La arquitectura considera abiertas únicamente cuestiones que no alteran las invariantes anteriores:
 
 - futura taxonomía de THREADs (investigación, gestión u otros);
-- organización física futura del corpus;
+- organización temática interna de `warp/corpus/`;
 - reglas de agrupación de autoridad para conjuntos de documentos, manteniendo un único THREAD efectivo por documento;
-- posible integración futura de `scripts/check_knowledge.py` en CI o protecciones de `knowledge`;
+- posible integración futura de `warp/scripts/check_knowledge.py` en CI o protecciones de `knowledge`;
 - evolución futura hacia modelos de grafo si aportan valor real sin complejidad innecesaria.
 
 ## 18. Historial
@@ -435,3 +440,4 @@ La arquitectura considera abiertas únicamente cuestiones que no alteran las inv
 | 2.0.1 | 2026-09-08 | Se aclara que el HANDOFF recoge exclusivamente inputs procedentes de otros THREADs; el trabajo propio no se encola. |
 | 2.0.2 | 2026-09-08 | Se alinea el contrato del MANIFEST: identidad estructurada en YAML y responsabilidad obligatoria como sección Markdown no duplicada. |
 | 2.1.0 | 2026-09-08 | Se adopta divulgación progresiva: el agente carga una superficie mínima por defecto y consulta arquitectura/reglas completas sólo según la operación, apoyado por validación estructural automática. |
+| 2.2.0 | 2026-10-27 | Todo Warp pasa al espacio de nombres `warp/`; el corpus vive en `warp/corpus/`, separado de los THREADs y organizado por tema, para que transferir autoridad no mueva documentos. |

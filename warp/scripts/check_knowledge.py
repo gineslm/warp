@@ -58,11 +58,21 @@ def rel(root, path):
     return os.path.relpath(path, root).replace(os.sep, "/")
 
 
+SYSTEM_BASE = os.path.dirname(os.path.dirname(os.path.dirname(
+    os.path.abspath(__file__))))
+SYSTEM_PREFIXES = ("warp/core/", "warp/scripts/")
+
+
+def ref_base(root, token):
+    # La capa de sistema se resuelve donde vive este checker: en una
+    # instancia coincide con la raíz; en la distribución, es el propio repo.
+    return SYSTEM_BASE if token.startswith(SYSTEM_PREFIXES) else root
+
+
 def find_root(start):
     p = os.path.abspath(start)
     while True:
-        if os.path.isfile(os.path.join(
-                p, "docs", "core", "THREAD_ARCHITECTURE.md")):
+        if os.path.isfile(os.path.join(p, "warp", "index", "THREAD_INDEX.md")):
             return p
         q = os.path.dirname(p)
         if q == p: return None
@@ -116,7 +126,7 @@ def clean(cell):
 
 def thread_dirs(root):
     out = []
-    for base, dirs, files in os.walk(os.path.join(root, "docs")):
+    for base, dirs, files in os.walk(os.path.join(root, "warp", "threads")):
         dirs[:] = [d for d in dirs if d not in SKIP]
         if "MANIFEST.md" in files: out.append(base)
     return sorted(out)
@@ -179,15 +189,15 @@ def check_threads(root, rep):
             token = token.strip()
             if "/" in token and "." in token and \
                     token.rsplit(".", 1)[-1].lower() in REF_EXTS and \
-                    not os.path.exists(os.path.join(root, token)):
+                    not os.path.exists(os.path.join(ref_base(root, token), token)):
                 rep.error("%s: referencia inexistente '%s'." % (mr, token))
     return ids, mpaths, data, texts
 
 
 def check_thread_index(root, rep, mpaths, data):
-    p = os.path.join(root, "docs", "core", "THREAD_INDEX.md")
+    p = os.path.join(root, "warp", "index", "THREAD_INDEX.md")
     if not os.path.isfile(p):
-        rep.error("Falta docs/core/THREAD_INDEX.md."); return
+        rep.error("Falta warp/index/THREAD_INDEX.md."); return
     target = None
     for head, rows in tables(read(p)):
         low = [x.lower() for x in head]
@@ -217,9 +227,9 @@ def check_thread_index(root, rep, mpaths, data):
 
 
 def check_document_index(root, rep, ids, data, texts):
-    p = os.path.join(root, "docs", "core", "DOCUMENT_INDEX.md")
+    p = os.path.join(root, "warp", "index", "DOCUMENT_INDEX.md")
     if not os.path.isfile(p):
-        rep.error("Falta docs/core/DOCUMENT_INDEX.md."); return
+        rep.error("Falta warp/index/DOCUMENT_INDEX.md."); return
     target = None
     for head, rows in tables(read(p)):
         low = [x.lower() for x in head]
@@ -295,26 +305,39 @@ def versioned_text_files(root):
             yield os.path.join(root, rp)
 
 
+def git_toplevel(root):
+    try:
+        p = subprocess.run(["git", "-C", root, "rev-parse", "--show-toplevel"],
+                           check=True, stdout=subprocess.PIPE,
+                           stderr=subprocess.DEVNULL)
+        return os.path.normpath(p.stdout.decode().strip())
+    except (OSError, subprocess.CalledProcessError, UnicodeDecodeError):
+        return root
+
+
 def check_secrets(root, rep):
-    for full in versioned_text_files(root):
+    # Todo el repositorio, no solo la instancia: en la distribución la
+    # instancia de ejemplo es un subdirectorio.
+    base = git_toplevel(root)
+    for full in versioned_text_files(base):
         if os.path.basename(full) == "check_knowledge.py": continue
         try:
             if os.path.getsize(full) > MAX_SCAN:
-                rep.warn("No se escanea por tamaño '%s'." % rel(root, full)); continue
+                rep.warn("No se escanea por tamaño '%s'." % rel(base, full)); continue
             text = read(full)
         except Exception:
             continue
         for name, pattern in SECRETS:
             if pattern.search(text):
                 rep.error("Posible credencial (%s) en '%s'." %
-                          (name, rel(root, full)))
+                          (name, rel(base, full)))
                 break
 
 
 def main(argv):
     root = find_root(argv[1] if len(argv) > 1 else os.getcwd())
     if not root:
-        print("No se encontró la raíz del repositorio."); return 2
+        print("No se encontró una instancia Warp (warp/index/THREAD_INDEX.md)."); return 2
     print("Comprobando coherencia del conocimiento en: %s" % root)
     rep = Report()
     ids, mpaths, data, texts = check_threads(root, rep)
