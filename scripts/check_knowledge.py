@@ -125,8 +125,6 @@ def thread_dirs(root):
 def authority_paths(text):
     body = section(text, "Autoridad documental vigente")
     if body is None: return set(), False
-    if re.search(r"\bNingún\b|\bNingun[ao]?\b", body, re.I):
-        return set(), True
     return {x.strip() for x in re.findall(r"`([^`]+)`", body)
             if "/" in x or x.endswith(".md")}, True
 
@@ -257,14 +255,15 @@ def check_document_index(root, rep, ids, data, texts):
 
 
 def check_handoffs(root, rep, ids, data):
-    by_dir = {os.path.dirname(os.path.join(root, mp)): y for mp, y in data.items()}
+    by_dir = {os.path.normpath(os.path.dirname(os.path.join(root, mp))): y
+              for mp, y in data.items()}
     for d in thread_dirs(root):
         hp = os.path.join(d, "HANDOFF.md")
         if not os.path.isfile(hp): continue
-        receiver = by_dir.get(d, {}).get("thread_id")
+        receiver = by_dir.get(os.path.normpath(d), {}).get("thread_id")
         for m in re.finditer(r"```ya?ml\s*\n(.*?)\n```", read(hp), re.S):
             e = yaml_block("```yaml\n" + m.group(1) + "\n```")
-            if not e or "type" not in e: continue
+            if not e: continue
             hr = rel(root, hp)
             if e.get("type") not in H_TYPES:
                 rep.error("%s: type HANDOFF no válido." % hr)
