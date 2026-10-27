@@ -1,6 +1,6 @@
 # Warp — Contexto mínimo del proyecto para agentes
 
-**Versión:** 2.3.0  
+**Versión:** 2.4.0  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -57,6 +57,7 @@ Para trabajo ordinario dentro de un THREAD ya existente, esta superficie es sufi
 | cambiar arquitectura, reglas, bootstrap o convenciones del sistema | `THREAD_ARCHITECTURE.md` + `PROJECT_WORKING_RULES.md` completos |
 | guardar cambios | `GIT_COMMIT_RULES.md` |
 | modificar MANIFESTs, HANDOFFs, índices o autoridad documental | además ejecutar `python warp/scripts/check_knowledge.py` antes de consolidar |
+| empezar o retomar una tarea | `THREAD_ARCHITECTURE.md` §9.4: comprobar si ya existe su rama o su PR |
 | cambiar `warp.yaml`, `warp/USERS.md` o la configuración de agentes y CI | `THREAD_ARCHITECTURE.md` §4.4 y §16: es trabajo del THREAD `governance` |
 | trabajar dentro de tu THREAD en documentos bajo su autoridad | nada más: MANIFEST + HANDOFF + corpus relevante bastan |
 
@@ -136,3 +137,4 @@ Antes de terminar:
 | 2.1.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |
 | 2.2.0 | 2026-10-27 | Nueva entrada en «Cuándo leer más» para la configuración del proyecto (THREAD `governance`); `warp.yaml` y `warp/USERS.md` entre las fuentes. Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |
 | 2.3.0 | 2026-10-27 | La regla dura 3 incorpora el modelo de participación: cualquier participante activo trabaja; integrar requiere al `owner` o su aprobación. |
+| 2.4.0 | 2026-10-27 | Nueva entrada en «Cuándo leer más» para empezar o retomar una tarea (`THREAD_ARCHITECTURE.md` §9.4). |

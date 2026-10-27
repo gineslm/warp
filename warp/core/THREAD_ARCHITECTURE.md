@@ -1,6 +1,6 @@
 # Warp — Arquitectura de THREADs y conocimiento
 
-**Versión:** 2.5.0  
+**Versión:** 2.6.0  
 **Estado:** Especificación operativa  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -47,7 +47,7 @@ El parámetro `layout` de `warp.yaml` (§16.2) declara si el repositorio contien
 
 Leer el corpus desde el código es libre y no exige conectarse a ningún THREAD.
 
-Las ramas de trabajo (`agent/*`) nacen de `knowledge`. Son espacios operativos y nunca sustituyen a `knowledge` como fuente global de verdad.
+Las ramas de trabajo (`agent/<thread_id>/<tarea>`, §9.4) nacen de `knowledge`. Son espacios operativos y nunca sustituyen a `knowledge` como fuente global de verdad.
 
 ## 4. THREAD
 
@@ -276,27 +276,41 @@ El principio es **divulgación progresiva**: el caso ordinario trabaja con el co
 
 La reducción de contexto no reduce obligaciones. Los cambios estructurales se validan con `warp/scripts/check_knowledge.py`, que comprueba invariantes mecánicas sin sustituir el juicio semántico.
 
-## 9. Crear, conectar y proponer
+## 9. Crear, conectar, proponer y trabajar
 
-### Crear
+### 9.1 Crear
 
-Crear MANIFEST + HANDOFF y consolidarlos en `knowledge`. Antes de hacerlo, cargar las secciones de arquitectura/bootstrap indicadas en `PROJECT_AGENT_CONTEXT.md`.
+Crear el MANIFEST y el buzón `handoff/` y consolidarlos en `knowledge`. Antes de hacerlo, cargar las secciones de arquitectura/bootstrap indicadas en `PROJECT_AGENT_CONTEXT.md`.
 
-### Conectar
+### 9.2 Conectar
 
 Localizar el THREAD, leer el MANIFEST, incorporarse a su responsabilidad y consultar después HANDOFF y corpus relevante. Para este caso ordinario basta la superficie mínima salvo que la operación posterior requiera reglas adicionales.
 
-### Proponer a otro THREAD
+### 9.3 Proponer a otro THREAD
 
 Cuando un THREAD detecta una necesidad fuera de su autoridad:
 
 1. identifica el THREAD responsable mediante `THREAD_INDEX.md` / `DOCUMENT_INDEX.md`;
 2. no modifica el documento externo;
-3. registra una propuesta en el HANDOFF receptor;
+3. registra una entrada en el buzón del THREAD receptor (§7.2);
 4. conserva evidencia y contexto;
 5. continúa dentro de su responsabilidad salvo bloqueo explícito.
 
 Antes de crear o resolver una entrada HANDOFF se cargan las reglas específicas indicadas en `PROJECT_AGENT_CONTEXT.md`.
+
+### 9.4 Tareas y ramas de trabajo
+
+Una **tarea** es una unidad de trabajo con un resultado concreto dentro de un THREAD: resolver una entrada de su buzón, o desarrollar un documento o una decisión propios.
+
+- Cada tarea se trabaja en una rama `agent/<thread_id>/<tarea>`, nacida de `knowledge`. Una tarea tiene como máximo **una rama activa**.
+- Si la tarea **resuelve una entrada**, `<tarea>` es el nombre del archivo de la entrada sin extensión, por ejemplo `agent/ing-frontend/formulario-pago-un-paso`. Así cualquiera puede comprobar si una entrada ya se está trabajando.
+- Si la tarea **desarrolla documentos propios**, `<tarea>` es un nombre descriptivo, y el PR declara en su descripción los documentos que toca.
+- **Antes de empezar**, se comprueba si ya existe una rama, local o remota, o un PR abierto para esa tarea. Si es el mismo trabajo, se retoma; si es un aporte distinto, se abre otra tarea.
+- Una instancia de agente trabaja en **un único THREAD**. Si necesita algo de otro, registra una entrada en su buzón (§7).
+- Varias instancias en paralelo usan **directorios de trabajo distintos** (`git worktree` o clones), nunca la misma copia.
+- Si dos tareas del mismo THREAD tocan el mismo documento, se integran **en serie**: la segunda se actualiza con `knowledge` antes de integrarse.
+- Registrar una entrada en el buzón de otro THREAD puede ir en la misma rama y en la misma decisión que el trabajo propio que la origina, cuando ambos responden a una sola causa.
+- Una tarea termina al integrarse en `knowledge`, que es una decisión (§13), o al abandonarse. Después se borra su rama.
 
 ## 10. Dependencias y propuestas
 
@@ -465,7 +479,7 @@ Los documentos del método no forman parte del corpus ni figuran en `DOCUMENT_IN
 ### 16.2 `warp.yaml`
 
 ```yaml
-warp_version: 2.5.0          # versión del método
+warp_version: 2.6.0          # versión del método
 project:
   name: <nombre>
   repository: <organización/repositorio>
@@ -512,3 +526,4 @@ La arquitectura considera abiertas únicamente cuestiones que no alteran las inv
 | 2.3.0 | 2026-10-27 | `knowledge` como única rama exigida, con árbol propio y `layout`; THREAD `governance`; cinco categorías de archivo; `warp.yaml` y `warp/USERS.md`; `DOCUMENT_INDEX` limitado al corpus; los datos del proyecto salen del core. |
 | 2.4.0 | 2026-10-27 | `owner` es un participante de `warp/USERS.md`, nunca un agente; §4.5 separa leer, trabajar e integrar, y la responsabilidad se ejerce al integrar; `enforcement` en `warp.yaml`. |
 | 2.5.0 | 2026-10-27 | HANDOFF como buzón por entradas: un archivo por entrada en `warp/threads/<thread_id>/handoff/`, con bloque de identidad, contexto y evidencia en prosa y dos zonas de escritura; el tipo `task` pasa a `request`. |
+| 2.6.0 | 2026-10-27 | §9.4 tareas y ramas de trabajo: una rama activa por tarea, nombre de la tarea igual al de la entrada que resuelve, una instancia por THREAD y directorios de trabajo separados; subsecciones del §9 numeradas. |
