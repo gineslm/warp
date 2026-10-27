@@ -149,6 +149,8 @@ Las **invariantes estructurales** (MANIFEST, índices, buzones, capa de sistema)
 
 Uso previsto: `advisory` para proyectos de una persona y en la subfase 4a del piloto; `strict` en la 4b, con CI. Que la rigidez haga falta se decide con datos.
 
+`strict` con CI como requisito de merge necesita protección de ramas, que en repos privados requiere GitHub Pro o Team (evaluación, §8c). En un repo privado gratuito, `strict` solo puede aplicarse en el checker local y en las reglas del agente, no en GitHub.
+
 ---
 
 ## 6. `warp.yaml`
@@ -320,7 +322,7 @@ Hay que actualizar todas las rutas `docs/core/…` del core y del README. Aparec
 1. **`repository.knowledge_branch` en el MANIFEST:** con `knowledge` fijo, el campo sobra. ¿Se retira o se deja verificando que vale `knowledge`?
 2. **Versión del conjunto:** hoy cada documento del core tiene su propia versión. Falta la versión del método, como etiqueta de release en `warp`, que es la que registra `warp_version`.
 3. **¿La CI va incluida por defecto en `init`?**
-4. **Aprobación del `owner` en `strict`:** comprobarla exige consultar la API de GitHub desde la CI. Hay que verificar en la fase 1 qué permite el plan para repos privados.
+4. **Aprobación del `owner` en `strict`:** comprobarla exige consultar la API de GitHub desde la CI. Hacerla obligatoria para el merge requiere protección de ramas: en repos privados, GitHub Pro o Team (evaluación, §8c).
 
 ---
 
@@ -329,4 +331,4 @@ Hay que actualizar todas las rutas `docs/core/…` del core y del README. Aparec
 - **Fase 0b** (correcciones del checker y memoria): PR a `warp` sobre la estructura actual. Es el primer uso del flujo «mejoras por PR».
 - **Fase 2:** se añade la reestructuración de §9.1–§9.2. Va **antes** de los demás cambios del core, para no escribirlos dos veces sobre rutas que van a cambiar. Las plantillas nuevas (§9.2.3) se integran con el buzón por entradas (evaluación, 4.4).
 - **Fase 3:** se añaden el checker de §9.3 y el instalador (`init`, `upgrade`). El instalador va antes de la CI, porque la CI la instala `init --ci`.
-- **Fase 4a:** el piloto empieza con `warp.py init` en un repo nuevo, con `enforcement: advisory`. **4b:** `strict` con CI.
+- **Fase 4a:** el piloto empieza con `warp.py init` en un repo nuevo, con `enforcement: advisory`, válido con cualquier plan de GitHub. **4b:** `strict` con CI obligatoria, que en un repo privado requiere GitHub Pro o Team.
