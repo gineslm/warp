@@ -191,7 +191,7 @@ users:
 5. Crea la rama `knowledge`.
 6. Ejecuta el checker.
 7. **No hace commit.** Muestra el mensaje propuesto, del tipo `chore(warp): adoptar Warp 2.2.0`, con su «Por qué:», para que la persona lo confirme.
-8. **No toca el remoto.** Imprime la protección recomendada para `knowledge`: sin force-push, checks requeridos, squash como único método y mensaje «PR title and description». La persona la aplica.
+8. **No toca el remoto.** Imprime la protección recomendada para `knowledge`: sin force-push, checks requeridos (incluido el escaneo de secretos de cada commit del PR), merge commit como único método y mensaje «PR title and description». La persona la aplica.
 
 ### `upgrade --from <ruta a un clon de warp>`
 
@@ -230,7 +230,8 @@ Hay que actualizar todas las rutas `docs/core/…` del core y del README. Aparec
    - se quita la línea `**Repositorio:** tu-organización/tu-repositorio` de las cabeceras de los siete documentos que la llevan;
    - los bloques compactos (`PROJECT_AGENT_CONTEXT.md:126`, `THREAD_CONTEXT_BOOTSTRAP.md:191`) remiten a `warp.yaml`.
 3. **Plantillas nuevas en `warp/core/`:** el instalador necesita formas canónicas que hoy no existen. Solo hay un MANIFEST de ejemplo, no una plantilla. Hacen falta `MANIFEST_TEMPLATE.md`, `HANDOFF_ENTRY_TEMPLATE.md` (formato `yaml`, evaluación 4.14) y `USERS_TEMPLATE.md`.
-4. **`PROJECT_AGENT_CONTEXT.md` §2:** añadir la regla dura de estado fuera del repo (evaluación, 4.5) y el modelo de autoridad en una línea.
+4. **`PROJECT_AGENT_CONTEXT.md` §2:** añadir la regla dura de estado fuera del repo (evaluación, 4.5), la regla de criterio sobre información sensible (evaluación, §8b) y el modelo de autoridad en una línea.
+5. **`GIT_COMMIT_RULES.md`:** la integración en `knowledge` se hace con merge commit; los dos niveles de mensaje (decisión y deliberación); y la lectura de las decisiones con `--first-parent` (evaluación, §8b).
 
 ### 9.3 Checker
 

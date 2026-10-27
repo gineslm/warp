@@ -13,7 +13,7 @@
 - **La auditoría es sólida.** De 14 hallazgos: 9 **confirmados**, 5 con **matiz**, ninguno refutado.
 - **Faltan defectos del checker actual** que ninguna lectura del código detectaba y que salieron al ejecutar pruebas negativas (§2.2). El más grave: **en Windows nunca se comprueba la regla «el HANDOFF no admite trabajo propio»** (§4.15).
 - **Tres correcciones de diseño importantes:**
-  1. Los hooks sobre `git commit` (4.3, capas 3–4) **contradicen D5**: con squash, los commits de trabajo no se validan; lo que importa es el título y la descripción del PR. Propongo retirarlos.
+  1. Los hooks sobre `git commit` (4.3, capas 3–4) **contradicen D5**: los commits de trabajo de la rama no se validan; lo que se valida es el título y la descripción del PR, que forman el mensaje del merge en `knowledge`. Propongo retirarlos.
   2. El generador de índices tras el merge (4.10, opción a) **choca con el checker actual**: un PR que crea un hilo sin tocar `THREAD_INDEX.md` falla el checker (§2.2, T13). Generador y checker se diseñan juntos; propongo una alternativa sin commits automáticos.
   3. La hoja de ruta pone el piloto **después** de todas las herramientas, cuando D4 lo quiere **durante** su construcción, con integración central (§5).
 - **Hallazgos nuevos:** §4.15–§4.21. El más estructural: el propio repo `warp` no se gobierna con Warp (§4.20), lo que afecta a D6 y a la pregunta abierta 2.
@@ -96,16 +96,18 @@ código de salida: 0
 - **Verificado:**
   - Los hooks `PreToolUse` admiten `permissionDecision: allow | deny | ask | defer`. El código de salida 2 bloquea.
   - El filtro `if` se documenta como «best-effort», con la recomendación de usar el sistema de permisos para bloqueos duros.
-  - GitHub permite fijar el mensaje por defecto del squash a «**Pull request title and description**».
+  - GitHub permite fijar el mensaje por defecto del squash a «**Pull request title and description**». Para los merge commits existe, según conocimiento previo, una opción equivalente; verificarla en la fase 1.
 - **Corrección 1, las capas 3 y 4 contradicen D5.** D5 valida «el mensaje que entra a `knowledge` … no los commits de trabajo de las ramas `agent/*`», y 4.6.2 declara libres los commits WIP. Un hook de pre-commit o de Claude Code sobre `git commit` valida precisamente esos commits. **Propuesta:** retirar ambas capas. La puerta humana se aplica al **título y la descripción del PR**: el agente los muestra y espera confirmación antes de `gh pr create` o `gh pr edit`.
-- **Corrección 2, ajuste de squash obligatorio.** La opción por defecto de GitHub usa el **mensaje del commit** cuando el PR tiene un solo commit, no la descripción. Así, un PR de un solo commit WIP entraría en `knowledge` con un mensaje no validado. La regla debe fijar «Pull request title and description».
-- **Confirmado:** la capa 5 es necesaria. El mensaje se puede editar en el diálogo de merge **después** de pasar la CI. Que la página de squash no lo diga explícitamente es conocimiento previo; verificarlo en la fase 1.
+- **Corrección 2, configuración de merge obligatoria** (revisada en §8b: se integra con merge commit, no con squash). Por defecto, GitHub escribe en el merge commit «Merge pull request #N from …», no la decisión. La regla debe fijar dos cosas:
+  - el merge commit como **único** método permitido, con squash y rebase desactivados, para que nadie pueda elegir otro;
+  - el mensaje «Pull request title and description».
+- **Confirmado:** la capa 5 es necesaria. El mensaje se puede editar en el diálogo de merge **después** de pasar la CI. Que la documentación consultada no lo diga explícitamente es conocimiento previo; verificarlo en la fase 1.
 - **Recomendación:** adoptar las capas 1, 2 y 5. Retirar la 3 y la 4.
 
 ### 4.4 `HANDOFF.md` como punto de conflicto — **Confirmado, con tensiones adicionales**
 
 - **Confirmado:** cualquier hilo escribe en el buzón receptor (`THREAD_ARCHITECTURE.md:179`). Las dos zonas lógicas comparten archivo (`:205-209`) y la resolución se hace en el mismo commit (`:211-229`). T10 muestra qué rompe cambiar `handoff.path`: `check_knowledge.py:166-173` y `:215-216`.
-- **El buzón por entradas es compatible con §7.2.** Registrar sin aprobación del receptor ya es la regla vigente. Y el squash **refuerza** §7.4: aunque haya varios commits WIP, en `knowledge` aplicar la decisión y retirar la entrada caen en un solo commit.
+- **El buzón por entradas es compatible con §7.2.** Registrar sin aprobación del receptor ya es la regla vigente. Y el merge commit **cumple** §7.4 a nivel de decisión: aunque la rama tenga varios commits de trabajo, la diferencia del merge respecto a su primer padre contiene a la vez el cambio y la retirada de la entrada. Se comprobó en un repo de prueba (§8b).
 - **Tensiones que la propuesta no cubre:**
   1. **Las dos zonas siguen existiendo.** El receptor cambia `status` y `working_notes` de una entrada abierta, es decir, **modifica** el archivo. Y el emisor puede querer ampliar la evidencia de su propia entrada. «Solo añadir» es demasiado estricto. La regla correcta: el emisor añade o modifica **sus** entradas, mientras sigan en `proposed`; el receptor modifica y borra cualquiera.
   2. **No generar `HANDOFF.md` como vista.** Si el buzón es un directorio, el directorio **es** la vista. Generar un `HANDOFF.md` reintroduce el problema del índice derivado (§4.10). `handoff.path` pasa a apuntar al directorio.
@@ -126,7 +128,7 @@ código de salida: 0
 ### 4.6 Quién integra en `knowledge` — **Confirmado**
 
 - **Confirmado por grep:** no hay ninguna regla sobre merge, PR, integración o «escritor» en el core. Las únicas coincidencias de «integración» se refieren a `develop` y a la cuestión abierta de CI.
-- **Matiz 1, un PR = una decisión.** El squash convierte el PR en la unidad de decisión. Falta decidir si una decisión de A que genera una propuesta a B va en **un** PR (decisión en A más entrada nueva en el buzón de B) o en dos. La arquitectura sugiere que es una sola causa (`THREAD_ARCHITECTURE.md:271-277`, `GIT_COMMIT_RULES.md:21-22`). Si es un PR, la comprobación de CI de 4.11 debe permitir «documentos propios más entradas propias en buzones ajenos».
+- **Matiz 1, un PR = una decisión.** El merge commit convierte el PR en la unidad de decisión. Falta decidir si una decisión de A que genera una propuesta a B va en **un** PR (decisión en A más entrada nueva en el buzón de B) o en dos. La arquitectura sugiere que es una sola causa (`THREAD_ARCHITECTURE.md:271-277`, `GIT_COMMIT_RULES.md:21-22`). Si es un PR, la comprobación de CI de 4.11 debe permitir «documentos propios más entradas propias en buzones ajenos».
 - **Matiz 2, la rama `knowledge` no existe.** El repo solo tiene `main`. Es coherente, porque este repo publica el método (§4.20), pero el piloto la necesita creada y protegida: sin force-push, ya que los trailers `Sustituye:` dependen de SHAs estables.
 - **Recomendación:** adoptar.
 
@@ -257,7 +259,7 @@ El checker comprueba índice → MANIFEST, pero no MANIFEST → índice (T14). U
 
 ### Pasos que faltan
 
-- Crear y proteger `knowledge` en el repo del piloto: sin force-push, con checks requeridos, squash como único método y mensaje «PR title and description».
+- Crear y proteger `knowledge` en el repo del piloto: sin force-push, con checks requeridos (incluido el escaneo de secretos de **cada commit** del PR), merge commit como único método y mensaje «PR title and description».
 - Verificar en la fase 1 qué ofrece el plan de GitHub para **repos privados**. Que las reglas de rama en privados requieran un plan de pago es conocimiento previo, no verificado aquí.
 - Decidir 4.20 antes de la fase 2, porque determina dónde se ejercitan los cambios del core.
 
@@ -291,7 +293,7 @@ El checker comprueba índice → MANIFEST, pero no MANIFEST → índice (T14). U
 | 4.20 | **Decidido (2026-10-27):** `warp` es la distribución, no una instancia; el core es de solo lectura en las instancias. Ver `PROPUESTA_CAPA_INSTALACION.md`. |
 | 4.1 + 4.8 | Adoptar fusionados, con tres perfiles. |
 | 4.2 | Adoptar: solo remisión, `@` más prosa. |
-| 4.3 | Adoptar las capas 1, 2 y 5; retirar la 3 y la 4; fijar el ajuste de squash. |
+| 4.3 | Adoptar las capas 1, 2 y 5; retirar la 3 y la 4; fijar el merge commit como único método y su mensaje. |
 | 4.4 | Adoptar, con las dos zonas y sin vista generada. |
 | 4.6, 4.7, 4.12 | Adoptar con los matices indicados. |
 | 4.11 | Adoptar con la regla revisada en §8b (autor = `owner` o aprobación del `owner`). |
@@ -310,6 +312,12 @@ Decisiones tomadas al discutir esta evaluación. Detalle en `PROPUESTA_CAPA_INST
 - **4.20:** `warp` es la distribución, no una instancia. Ver la decisión en §4.20.
 - **D2 de la auditoría, revisada:** se mantiene un responsable único por hilo y una rama activa por tarea. **Se retira** la comprobación de que «quien empieza es el responsable». Cualquier usuario activo puede conectarse a cualquier hilo y trabajar en él; la responsabilidad se ejerce al integrar.
 - **4.11, revisado:** la regla de CI pasa de «el autor del PR es el `owner`» a «**el autor es el `owner` o el `owner` aprobó el PR**». Desaparece así la tensión de CODEOWNERS cuando contribuye otra persona. `owner` es un `github` de `warp/USERS.md`. La rigidez se regula con `enforcement: advisory | strict` en `warp.yaml`; las invariantes estructurales son siempre errores.
+- **Integración con merge commit, no con squash.** En un repo de conocimiento, los commits de la rama registran la deliberación: las alternativas evaluadas y descartadas hasta llegar a la decisión. Ese registro tiene valor propio y debe quedar en Git, no solo en la página del PR en GitHub. Comprobado en un repo de prueba: `git log --first-parent` muestra solo las decisiones; el historial del buzón con `--first-parent` también; la diferencia del merge respecto a su primer padre contiene el cambio y la retirada de la entrada; y `git blame --first-parent` atribuye cada línea a la decisión que la incorporó. Consecuencias:
+  - **dos niveles de mensaje:** *decisión* (el merge en `knowledge`, validado con `tipo(area): …` y «Por qué:») y *deliberación* (los commits de la rama, sin validación mecánica, pero se recomienda que digan qué se evaluó o descartó, no «wip»). `GIT_COMMIT_RULES.md` §2 debe distinguirlos;
+  - **las decisiones se leen con `--first-parent`:** es una regla para agentes y herramientas, que va en `GIT_COMMIT_RULES.md`. La web de GitHub no ofrece esa vista y muestra también los commits de la rama;
+  - **los secretos se revisan en cada commit del PR**, no solo en el estado final, porque todo commit de la rama queda para siempre en `knowledge`;
+  - **regla de criterio nueva:** lo que no puede quedar para siempre no se escribe en el repo, ni siquiera en un borrador (datos personales, información confidencial de clientes o contratos). Ningún checker lo detecta; va junto a la regla dura de secretos en `PROJECT_AGENT_CONTEXT.md` §2;
+  - **queda sin efecto** la integración por squash propuesta en 4.3 (corrección 2) y 4.6 (paso 4).
 - **Gobierno del proyecto:** un hilo con identificador reservado `governance` tiene autoridad sobre `warp.yaml`, `warp/USERS.md`, `AGENTS.md`, `.claude/settings.json` y la CI de cada instancia.
 
 ---
