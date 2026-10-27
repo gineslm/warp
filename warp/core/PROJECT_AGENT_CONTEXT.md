@@ -1,6 +1,6 @@
 # Warp — Contexto mínimo del proyecto para agentes
 
-**Versión:** 2.5.0  
+**Versión:** 2.6.0  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -21,6 +21,8 @@ La conversación/agente es temporal. El repositorio es la memoria duradera.
 6. Una entrada resuelta sale del HANDOFF en el mismo commit que aplica o registra la decisión; Git conserva el historial.
 7. Una decisión es un guardado de unión (merge commit) en `knowledge`; los guardados de la rama conservan la deliberación. Antes de guardar cambios se aplica `warp/core/GIT_COMMIT_RULES.md`.
 8. Ninguna llave, token, contraseña o secreto se guarda en archivos versionados.
+9. Ningún estado persistente fuera del repositorio es fuente de verdad: ni la memoria de los agentes, ni la de los proyectos de chat, ni notas locales. Lo que deba perdurar se consolida en `knowledge`.
+10. Lo que no puede quedar para siempre no se escribe en el repositorio, ni siquiera en un borrador ni en una rama: datos personales, información confidencial de clientes o contratos, y similares. Git conserva todos los guardados de la rama (`warp/core/GIT_COMMIT_RULES.md` §2), y ninguna comprobación automática detecta este contenido.
 
 ## 3. Entrada por defecto
 
@@ -139,3 +141,4 @@ Antes de terminar:
 | 2.3.0 | 2026-10-27 | La regla dura 3 incorpora el modelo de participación: cualquier participante activo trabaja; integrar requiere al `owner` o su aprobación. |
 | 2.4.0 | 2026-10-27 | Nueva entrada en «Cuándo leer más» para empezar o retomar una tarea (`THREAD_ARCHITECTURE.md` §9.4). |
 | 2.5.0 | 2026-10-27 | La regla dura 7 distingue decisión (guardado de unión en `knowledge`) y deliberación (guardados de la rama). |
+| 2.6.0 | 2026-10-27 | Reglas duras 9 (ninguna memoria externa al repositorio es fuente de verdad) y 10 (lo que no puede quedar para siempre no se escribe en el repositorio). |
