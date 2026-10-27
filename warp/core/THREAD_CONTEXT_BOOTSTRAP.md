@@ -1,6 +1,6 @@
 # Warp — Bootstrap de contexto de THREADs
 
-**Versión:** 2.2.0  
+**Versión:** 2.3.0  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -90,7 +90,7 @@ Fuera de alcance:
 Documentos bajo autoridad directa:
 Corpus/dependencias relevantes:
 HANDOFF:
-Rama de trabajo, si procede:
+Tarea y rama de trabajo (`agent/<thread_id>/<tarea>`, `THREAD_ARCHITECTURE.md` §9.4):
 Validación requerida:
 ```
 
@@ -193,3 +193,4 @@ El checker no juzga significado, calidad de responsabilidad, oportunidad de una 
 | 2.1.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |
 | 2.1.2 | 2026-10-27 | Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |
 | 2.2.0 | 2026-10-27 | Registrar una propuesta es crear un archivo de entrada en el buzón del receptor a partir de `HANDOFF_ENTRY_TEMPLATE.md`. |
+| 2.3.0 | 2026-10-27 | El contrato de trabajo de la sesión identifica la tarea y su rama (`THREAD_ARCHITECTURE.md` §9.4). |
