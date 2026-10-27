@@ -7,6 +7,7 @@ Ejecutar: python scripts/test_check_knowledge.py
 
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -25,11 +26,20 @@ def entry(origin, with_type=True):
     return "\n```yaml\n%s\n```\n" % "\n".join(lines)
 
 
+def writable(path):
+    # copytree copia el atributo de solo lectura (p. ej. carpetas de OneDrive),
+    # que impediría modificar y borrar la copia temporal.
+    for base, dirs, files in os.walk(path):
+        for name in dirs + files:
+            os.chmod(os.path.join(base, name), stat.S_IREAD | stat.S_IWRITE)
+
+
 class CheckKnowledge(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.mkdtemp()
         shutil.copytree(os.path.join(ROOT, "docs"), os.path.join(self.tmp, "docs"))
+        writable(self.tmp)
 
     def tearDown(self):
         shutil.rmtree(self.tmp)
