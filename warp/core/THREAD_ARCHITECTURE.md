@@ -1,6 +1,6 @@
 # Warp — Arquitectura de THREADs y conocimiento
 
-**Versión:** 2.9.0  
+**Versión:** 2.10.0  
 **Estado:** Especificación operativa  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -481,7 +481,7 @@ Los documentos del método no forman parte del corpus ni figuran en `DOCUMENT_IN
 ### 16.2 `warp.yaml`
 
 ```yaml
-warp_version: 2.9.0          # versión del método
+warp_version: <versión del método>
 project:
   name: <nombre>
   repository: <organización/repositorio>
@@ -491,6 +491,8 @@ enforcement: advisory        # advisory | strict
 ```
 
 El nombre de la rama de conocimiento no es configurable: es `knowledge`.
+
+`warp_version` es la **versión del método** instalada y coincide con `warp/VERSION`, que forma parte de la capa de sistema. Sigue el esquema MAJOR.MINOR.PATCH: MAJOR cuando cambia el formato de las instancias y exige migrarlas; MINOR cuando se añaden reglas o herramientas compatibles; PATCH para correcciones sin cambios de reglas. Las versiones de cada documento del core describen la evolución de ese documento; la de una instancia es la del método.
 
 `enforcement` regula solo las comprobaciones sobre **personas**: que el `owner` sea un participante activo y que la integración la haga o la apruebe el `owner` (§4.5). Con `advisory` son avisos; con `strict`, errores y requisito de merge. Las invariantes estructurales son siempre errores. En repos privados, hacer `strict` obligatorio en GitHub requiere un plan con protección de ramas.
 
@@ -532,3 +534,4 @@ La arquitectura considera abiertas únicamente cuestiones que no alteran las inv
 | 2.7.0 | 2026-10-27 | §13: la decisión es el guardado de unión en `knowledge` y la rama conserva la deliberación. |
 | 2.8.0 | 2026-10-27 | El principio 1 excluye como fuente de verdad cualquier memoria externa al repositorio. |
 | 2.9.0 | 2026-10-27 | §9.4: el PR de una tarea se dirige siempre a `knowledge`. Entrada para agentes en `AGENTS.md` (plantilla `AGENTS_TEMPLATE.md`). |
+| 2.10.0 | 2026-10-27 | Versión del método: `warp/VERSION` en la capa de sistema, con esquema MAJOR.MINOR.PATCH; `warp_version` coincide con ella. |

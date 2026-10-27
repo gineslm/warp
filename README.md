@@ -542,6 +542,7 @@ Future directions are outside the current core:
 ├── LICENSE-DOCS
 │
 ├── warp/                          # the method: what a project adopts
+│   ├── VERSION
 │   ├── core/
 │   │   ├── THREAD_ARCHITECTURE.md
 │   │   ├── PROJECT_WORKING_RULES.md

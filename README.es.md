@@ -542,6 +542,7 @@ Las líneas futuras quedan fuera del core actual:
 ├── LICENSE-DOCS
 │
 ├── warp/                          # el método: lo que adopta un proyecto
+│   ├── VERSION
 │   ├── core/
 │   │   ├── THREAD_ARCHITECTURE.md
 │   │   ├── PROJECT_WORKING_RULES.md
