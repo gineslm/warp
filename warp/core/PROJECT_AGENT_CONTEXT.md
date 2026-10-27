@@ -1,6 +1,6 @@
 # Warp — Contexto mínimo del proyecto para agentes
 
-**Versión:** 2.4.0  
+**Versión:** 2.5.0  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -19,7 +19,7 @@ La conversación/agente es temporal. El repositorio es la memoria duradera.
 4. Para cambiar conocimiento bajo autoridad ajena se registra un input en el HANDOFF del THREAD responsable.
 5. El HANDOFF contiene exclusivamente inputs pendientes procedentes de **otros THREADs**; el trabajo propio no se encola.
 6. Una entrada resuelta sale del HANDOFF en el mismo commit que aplica o registra la decisión; Git conserva el historial.
-7. Un commit representa una decisión; antes de guardar cambios se aplica `warp/core/GIT_COMMIT_RULES.md`.
+7. Una decisión es un guardado de unión (merge commit) en `knowledge`; los guardados de la rama conservan la deliberación. Antes de guardar cambios se aplica `warp/core/GIT_COMMIT_RULES.md`.
 8. Ninguna llave, token, contraseña o secreto se guarda en archivos versionados.
 
 ## 3. Entrada por defecto
@@ -138,3 +138,4 @@ Antes de terminar:
 | 2.2.0 | 2026-10-27 | Nueva entrada en «Cuándo leer más» para la configuración del proyecto (THREAD `governance`); `warp.yaml` y `warp/USERS.md` entre las fuentes. Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |
 | 2.3.0 | 2026-10-27 | La regla dura 3 incorpora el modelo de participación: cualquier participante activo trabaja; integrar requiere al `owner` o su aprobación. |
 | 2.4.0 | 2026-10-27 | Nueva entrada en «Cuándo leer más» para empezar o retomar una tarea (`THREAD_ARCHITECTURE.md` §9.4). |
+| 2.5.0 | 2026-10-27 | La regla dura 7 distingue decisión (guardado de unión en `knowledge`) y deliberación (guardados de la rama). |

@@ -1,4 +1,4 @@
-warp_version: 2.6.0          # versión del método
+warp_version: 2.7.0          # versión del método
 project:
   name: Ejemplo mínimo de Warp
   repository: ejemplo/warp-minimal
