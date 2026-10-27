@@ -282,8 +282,13 @@ def check_document_index(root, rep, ids, data, texts):
 
 def check_config(root, rep):
     y = yaml_block("```yaml\n" + read(os.path.join(root, "warp.yaml")) + "\n```") or {}
-    if not re.fullmatch(r"\d+\.\d+\.\d+", y.get("warp_version") or ""):
+    version = y.get("warp_version") or ""
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
         rep.error("warp.yaml: warp_version debe ser una versión X.Y.Z.")
+    vfile = os.path.join(SYSTEM_BASE, "warp", "VERSION")
+    if os.path.isfile(vfile) and version != read(vfile).strip():
+        rep.error("warp.yaml: warp_version '%s' no coincide con warp/VERSION '%s'." %
+                  (version, read(vfile).strip()))
     project = y.get("project")
     for k in ("name", "repository", "language"):
         if not isinstance(project, dict) or not project.get(k):

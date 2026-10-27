@@ -321,7 +321,7 @@ Hay que actualizar todas las rutas `docs/core/…` del core y del README. Aparec
 ## 11. Cuestiones abiertas
 
 1. **`repository.knowledge_branch` en el MANIFEST:** con `knowledge` fijo, el campo sobra. ¿Se retira o se deja verificando que vale `knowledge`?
-2. **Versión del conjunto:** hoy cada documento del core tiene su propia versión. Falta la versión del método, como etiqueta de release en `warp`, que es la que registra `warp_version`.
+2. ~~**Versión del conjunto.**~~ Resuelta: `warp/VERSION` en la capa de sistema, con esquema MAJOR.MINOR.PATCH y una etiqueta anotada por versión publicada (arquitectura 2.10.0, §16.2).
 3. **¿La CI va incluida por defecto en `init`?**
 4. **Aprobación del `owner` en `strict`:** comprobarla exige consultar la API de GitHub desde la CI. Hacerla obligatoria para el merge requiere protección de ramas: en repos privados, GitHub Pro o Team (evaluación, §8c).
 
