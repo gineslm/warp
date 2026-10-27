@@ -22,6 +22,7 @@
 | La configuración del proyecto vive en **`warp.yaml`, en la raíz**, y las personas en **`warp/USERS.md`**. | Ambos son documentos gobernados por el hilo `governance`. |
 | Existe un **hilo de gobierno** con identificador reservado `governance`, creado por el instalador. | Tiene autoridad sobre toda la configuración del proyecto. Ver §4. |
 | **Autoridad flexible:** cualquier usuario activo trabaja en cualquier hilo; integrar exige ser el `owner` o tener su aprobación. Rigidez configurable con `enforcement`. | Revisa D2 y 4.11 de la auditoría. Ver §5. |
+| **Integración desde el agente con confirmación humana:** reglas de permiso de Claude Code en `.claude/settings.json` (preguntar en cada merge, denegar los demás métodos y las operaciones destructivas). | El ciclo completo (rama, PR, validación, merge y limpieza) se hace sin pasar por la web de GitHub, y la puerta humana se mantiene en el terminal. Ver §8.3. |
 | Las instrucciones de uso van en **`INSTALL.md`, en la raíz** de `warp`, enlazado desde el README. | Ver §10. |
 
 ---
@@ -65,7 +66,7 @@ instancia/
 ├── warp.yaml              configuración del proyecto         → governance
 ├── warp.lock              huellas de la capa de sistema      (derivado)
 ├── AGENTS.md              remite al contexto mínimo          → governance
-├── .claude/settings.json  autoMemoryEnabled: false           → governance
+├── .claude/settings.json  memoria off + reglas de permiso    → governance
 ├── .github/workflows/     CI (opcional)                      → governance
 └── warp/
     ├── core/              método                             (sistema)
@@ -195,7 +196,7 @@ users:
 
 ## 8. El instalador (`warp/scripts/warp.py`)
 
-### `init <destino>`
+### 8.1 `init <destino>`
 
 1. Comprueba que el destino es un directorio vacío o un repo Git sin capa Warp.
 2. Pide o lee (`--config`):
@@ -207,14 +208,14 @@ users:
    - `warp.yaml` y `warp/USERS.md`;
    - el hilo `governance` (MANIFEST y buzón vacío, `origin: USER_DECLARED`, autoridad sobre su lista de §4);
    - los índices desde las plantillas;
-   - `AGENTS.md` y `.claude/settings.json`;
+   - `AGENTS.md` y `.claude/settings.json`, con la memoria desactivada y las reglas de permiso de §8.3;
    - la CI, solo con `--ci`.
 5. Crea la rama `knowledge` según `layout` (§3.1): como única rama y principal en `knowledge-only`, o con árbol propio, sin tocar las ramas existentes, en `with-code`. No crea `main` ni `develop`.
 6. Ejecuta el checker.
 7. **No hace commit.** Muestra el mensaje propuesto, del tipo `chore(warp): adoptar Warp 2.2.0`, con su «Por qué:», para que la persona lo confirme.
-8. **No toca el remoto.** Imprime la protección recomendada para `knowledge`: sin force-push, checks requeridos (incluido el escaneo de secretos de cada commit del PR), merge commit como único método y mensaje «PR title and description». Con `with-code`, añade la prohibición de fusionar `knowledge` en las ramas del código y, para el `AGENTS.md` del código, la línea sugerida en §3.2. Recomienda aplicar el método de merge con una regla limitada a `knowledge`, para no afectar al software (verificar en la fase 1 que GitHub lo permite). La persona lo aplica.
+8. **No toca el remoto.** Imprime la protección recomendada para `knowledge`: sin force-push, checks requeridos (incluido el escaneo de secretos de cada commit del PR), merge commit como único método (squash y rebase desactivados), mensaje «PR title and description» y borrado automático de las ramas fusionadas. Con `with-code`, añade la prohibición de fusionar `knowledge` en las ramas del código y, para el `AGENTS.md` del código, la línea sugerida en §3.2. Recomienda aplicar el método de merge con una regla limitada a `knowledge`, para no afectar al software (verificar en la fase 1 que GitHub lo permite). La persona lo aplica.
 
-### `upgrade --from <ruta a un clon de warp>`
+### 8.2 `upgrade --from <ruta a un clon de warp>`
 
 1. Comprueba que la capa de sistema coincide con `warp.lock`. Si alguien la editó, se detiene y lo indica.
 2. Reemplaza la capa de sistema y actualiza `warp.lock` y `warp_version`. Cambiar `warp_version` modifica `warp.yaml`, así que es una decisión del hilo `governance`.
@@ -222,6 +223,32 @@ users:
 4. Ejecuta el checker y muestra el mensaje propuesto. Sin commit.
 
 Sin red: la persona trae la versión nueva con `git clone` o `git fetch`. Así el script no maneja credenciales.
+
+### 8.3 Integración desde Claude Code
+
+Con estas reglas, el agente completa el ciclo de cada decisión sin pasar por la web de GitHub: rama, commit, PR, validación con el checker, merge y limpieza. La confirmación humana se mantiene en el terminal.
+
+```json
+{
+  "autoMemoryEnabled": false,
+  "permissions": {
+    "ask":   ["Bash(gh pr merge *)"],
+    "deny":  ["Bash(gh pr merge *--squash*)", "Bash(gh pr merge * -s*)",
+              "Bash(gh pr merge *--rebase*)", "Bash(gh pr merge * -r*)",
+              "Bash(git branch -D *)", "Bash(git branch --delete --force*)",
+              "Bash(git push *--force*)", "Bash(git push -f*)", "Bash(git push * -f*)",
+              "Bash(git reset --hard*)", "Bash(git reset * --hard*)"],
+    "allow": ["Bash(git branch -d *)", "Bash(git fetch --prune*)"]
+  }
+}
+```
+
+- **Preguntar en cada merge** es la puerta humana: Claude Code muestra el comando y espera confirmación. No se usa «permitir», por dos razones: una decisión entraría en `knowledge` sin validación, y un texto del corpus o de un buzón podría inducir al agente a fusionar.
+- **Denegar** los métodos distintos del merge commit y las operaciones que destruyen trabajo o historia. Las reglas comparan el texto del comando: cubren los casos normales, no variantes rebuscadas. La protección de fondo son los ajustes de GitHub de §8.1, paso 8.
+- **Permitir** `git branch -d`, que Git rechaza si la rama no está fusionada, y `git fetch --prune`. El borrado de la rama remota lo hace GitHub al fusionar; no se permite borrar ramas en remoto desde el agente.
+- **Antes de cada merge** el agente ejecuta el checker y las pruebas. Mientras no haya CI, esto lo garantiza el protocolo, no la máquina.
+- **Validado en `warp`** (PR #5, 2026-10-27): el aviso de confirmación aparece aunque Claude Code esté en modo automático; el merge commit, el borrado automático de la rama remota y la limpieza local funcionaron sin intervención en GitHub.
+- Las reglas son específicas de Claude Code. Otros agentes necesitan su mecanismo equivalente o la integración desde la web, y la puerta humana es la misma en ambos casos.
 
 ---
 
