@@ -1,6 +1,6 @@
 # Warp — Bootstrap de contexto de THREADs
 
-**Versión:** 2.3.0  
+**Versión:** 2.3.1  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -37,11 +37,11 @@ Nunca reconstruir el estado global desde una rama de trabajo ni desde el histór
 
 ### THREAD existente
 
-1. localizarlo en `warp/index/THREAD_INDEX.md`;
+1. localizarlo en `index/THREAD_INDEX.md`;
 2. leer su MANIFEST;
 3. verificar estado, responsabilidad y autoridad documental;
 4. leer su único HANDOFF persistente;
-5. descubrir documentos relevantes mediante `warp/index/DOCUMENT_INDEX.md` y referencias del MANIFEST.
+5. descubrir documentos relevantes mediante `index/DOCUMENT_INDEX.md` y referencias del MANIFEST.
 
 Para este caso ordinario no es necesario leer la arquitectura completa.
 
@@ -101,7 +101,7 @@ Antes de proponer o modificar una entrada HANDOFF, aplicar `THREAD_ARCHITECTURE.
 Cuando aparezca una necesidad fuera de la autoridad del THREAD:
 
 1. elegir un `<nombre>` descriptivo para la entrada (`formulario-pago-un-paso`);
-2. crear `warp/threads/<thread_id receptor>/handoff/<nombre>.md` a partir de `warp/core/HANDOFF_ENTRY_TEMPLATE.md`;
+2. crear `threads/<thread_id receptor>/handoff/<nombre>.md` a partir de `warp/core/HANDOFF_ENTRY_TEMPLATE.md`;
 3. rellenar el bloque de identidad (`origin_thread`, `type`, `summary`, `target_scope`, `status: proposed`);
 4. escribir `## Contexto` y `## Evidencia`, indicando si la necesidad bloquea el trabajo propio.
 
@@ -194,3 +194,4 @@ El checker no juzga significado, calidad de responsabilidad, oportunidad de una 
 | 2.1.2 | 2026-10-27 | Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |
 | 2.2.0 | 2026-10-27 | Registrar una propuesta es crear un archivo de entrada en el buzón del receptor a partir de `HANDOFF_ENTRY_TEMPLATE.md`. |
 | 2.3.0 | 2026-10-27 | El contrato de trabajo de la sesión identifica la tarea y su rama (`THREAD_ARCHITECTURE.md` §9.4). |
+| 2.3.1 | 2026-10-27 | Rutas del proyecto en la raíz de la instancia (`corpus/`, `threads/`, `index/`, `USERS.md`); el método queda en `warp/`. Sin cambios de fondo. |

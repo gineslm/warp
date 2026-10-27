@@ -556,23 +556,22 @@ Las líneas futuras quedan fuera del core actual:
 │       └── warp.py
 │
 ├── examples/
-│   └── minimal/                   # instancia de ejemplo
+│   └── minimal/                   # instancia de ejemplo (usa el método de `warp/` de este repositorio)
 │       ├── warp.yaml
-│       └── warp/
-│           ├── USERS.md
-│           ├── index/
-│           │   ├── THREAD_INDEX.md
-│           │   └── DOCUMENT_INDEX.md
-│           ├── threads/
-│           │   ├── governance/
-│           │   │   ├── MANIFEST.md
-│           │   │   └── handoff/
-│           │   └── example-notes/
-│           │       ├── MANIFEST.md
-│           │       └── handoff/
-│           │           └── explicar-registro-de-entradas.md
-│           └── corpus/
-│               └── NOTES.md
+│       ├── USERS.md
+│       ├── index/
+│       │   ├── THREAD_INDEX.md
+│       │   └── DOCUMENT_INDEX.md
+│       ├── threads/
+│       │   ├── governance/
+│       │   │   ├── MANIFEST.md
+│       │   │   └── handoff/
+│       │   └── example-notes/
+│       │       ├── MANIFEST.md
+│       │       └── handoff/
+│       │           └── explicar-registro-de-entradas.md
+│       └── corpus/
+│           └── NOTES.md
 │
 ├── tests/
 │   ├── test_check_knowledge.py

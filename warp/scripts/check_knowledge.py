@@ -26,11 +26,10 @@ LAYOUTS = {"knowledge-only", "with-code"}
 ENFORCEMENT = {"advisory", "strict"}
 USER_STATUS = {"active", "inactive"}
 GOVERNANCE = "governance"
-CONFIG_DOCS = {"warp.yaml", "warp/USERS.md"}
-CORPUS = "warp/corpus/"
+CONFIG_DOCS = {"warp.yaml", "USERS.md"}
+CORPUS = "corpus/"
 PLACEHOLDERS = {".gitkeep"}
-SYSTEM_DIRS = ("warp/core", "warp/scripts")
-SYSTEM_FILES = ("warp/VERSION", "warp/LICENSE-DOCS", "warp/LICENSE-CODE")
+SYSTEM = "warp"  # capa de sistema: el método, tal como se descarga
 SECRETS = [
     ("GitHub token", re.compile(r"gh[pousr]_[A-Za-z0-9]{30,}")),
     ("GitHub PAT", re.compile(r"github_pat_[A-Za-z0-9_]{30,}")),
@@ -72,7 +71,7 @@ def rel(root, path):
 
 SYSTEM_BASE = os.path.dirname(os.path.dirname(os.path.dirname(
     os.path.abspath(__file__))))
-SYSTEM_PREFIXES = ("warp/core/", "warp/scripts/")
+SYSTEM_PREFIXES = (SYSTEM + "/",)
 
 
 def ref_base(root, token):
@@ -138,7 +137,7 @@ def clean(cell):
 
 def thread_dirs(root):
     out = []
-    for base, dirs, files in os.walk(os.path.join(root, "warp", "threads")):
+    for base, dirs, files in os.walk(os.path.join(root, "threads")):
         dirs[:] = [d for d in dirs if d not in SKIP]
         if "MANIFEST.md" in files: out.append(base)
     return sorted(out)
@@ -194,7 +193,9 @@ def check_threads(root, rep):
             rep.error("thread_id duplicado '%s'." % tid)
         elif tid:
             ids[tid] = mr
-        nofence = re.sub(r"```.*?```", "", text, flags=re.S)
+        # El historial describe versiones pasadas: puede citar rutas que ya no existen.
+        nofence = re.sub(r"^##\s+Historial\s*$.*?(?=^##\s+|\Z)", "",
+                         re.sub(r"```.*?```", "", text, flags=re.S), flags=re.M | re.S)
         for token in re.findall(r"`([^`]+)`", nofence):
             token = token.strip()
             if "/" in token and "." in token and \
@@ -205,9 +206,9 @@ def check_threads(root, rep):
 
 
 def check_thread_index(root, rep, mpaths, data):
-    p = os.path.join(root, "warp", "index", "THREAD_INDEX.md")
+    p = os.path.join(root, "index", "THREAD_INDEX.md")
     if not os.path.isfile(p):
-        rep.error("Falta warp/index/THREAD_INDEX.md."); return
+        rep.error("Falta index/THREAD_INDEX.md."); return
     target = None
     for head, rows in tables(read(p)):
         low = [x.lower() for x in head]
@@ -237,9 +238,9 @@ def check_thread_index(root, rep, mpaths, data):
 
 
 def check_document_index(root, rep, ids, data, texts):
-    p = os.path.join(root, "warp", "index", "DOCUMENT_INDEX.md")
+    p = os.path.join(root, "index", "DOCUMENT_INDEX.md")
     if not os.path.isfile(p):
-        rep.error("Falta warp/index/DOCUMENT_INDEX.md."); return
+        rep.error("Falta index/DOCUMENT_INDEX.md."); return
     target = None
     for head, rows in tables(read(p)):
         low = [x.lower() for x in head]
@@ -302,9 +303,9 @@ def check_config(root, rep):
     if enforcement not in ENFORCEMENT:
         rep.error("warp.yaml: enforcement '%s' no válido." % enforcement)
     users = {}
-    p = os.path.join(root, "warp", "USERS.md")
+    p = os.path.join(root, "USERS.md")
     if not os.path.isfile(p):
-        rep.error("Falta warp/USERS.md."); return enforcement, users
+        rep.error("Falta USERS.md."); return enforcement, users
     target = None
     for head, rows in tables(read(p)):
         low = [x.lower() for x in head]
@@ -333,7 +334,7 @@ def check_owners(rep, data, users, enforcement):
         owner = y.get("owner")
         if not owner: continue
         if owner not in users:
-            report("%s: owner '%s' no figura en warp/USERS.md." % (mp, owner))
+            report("%s: owner '%s' no figura en USERS.md." % (mp, owner))
         elif users[owner] != "active" and \
                 y.get("status") not in {"CLOSED", "ARCHIVED"}:
             report("%s: owner '%s' no está active." % (mp, owner))
@@ -426,12 +427,11 @@ def git_toplevel(root):
 
 def system_files(root):
     """Rutas de la capa de sistema presentes en `root`, relativas y ordenadas."""
-    out = [f for f in SYSTEM_FILES if os.path.isfile(os.path.join(root, *f.split("/")))]
-    for d in SYSTEM_DIRS:
-        for base, dirs, files in os.walk(os.path.join(root, *d.split("/"))):
-            dirs[:] = [x for x in dirs if x not in SKIP]
-            out += [rel(root, os.path.join(base, f)) for f in files
-                    if not f.endswith(".pyc")]
+    out = []
+    for base, dirs, files in os.walk(os.path.join(root, SYSTEM)):
+        dirs[:] = [x for x in dirs if x not in SKIP]
+        out += [rel(root, os.path.join(base, f)) for f in files
+                if not f.endswith(".pyc")]
     return sorted(out)
 
 

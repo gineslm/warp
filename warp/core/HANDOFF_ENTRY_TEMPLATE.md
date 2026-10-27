@@ -1,13 +1,13 @@
 # Warp — Plantilla de entrada de HANDOFF
 
-**Versión:** 1.0.0  
+**Versión:** 1.0.1  
 **Estado:** Plantilla  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
 
 ## 1. Propósito
 
-Esta plantilla define la forma canónica de una entrada del buzón de un THREAD: un archivo `warp/threads/<thread_id receptor>/handoff/<nombre>.md` (`warp/core/THREAD_ARCHITECTURE.md` §7).
+Esta plantilla define la forma canónica de una entrada del buzón de un THREAD: un archivo `threads/<thread_id receptor>/handoff/<nombre>.md` (`warp/core/THREAD_ARCHITECTURE.md` §7).
 
 ## 2. Principios
 

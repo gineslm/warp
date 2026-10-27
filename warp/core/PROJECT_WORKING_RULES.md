@@ -1,6 +1,6 @@
 # Warp — Reglas de trabajo del proyecto
 
-**Versión:** 2.3.0  
+**Versión:** 2.3.1  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -19,7 +19,7 @@ Toda conversación nueva entra conceptualmente por `knowledge` antes de usar una
 
 Las ramas `agent/*` nacen de `knowledge`. Son espacios de trabajo, no fuentes alternativas de verdad global.
 
-La configuración del proyecto (`warp.yaml`, `warp/USERS.md`, configuración de agentes y CI) está bajo autoridad del THREAD `governance` (`warp/core/THREAD_ARCHITECTURE.md` §4.4).
+La configuración del proyecto (`warp.yaml`, `USERS.md`, configuración de agentes y CI) está bajo autoridad del THREAD `governance` (`warp/core/THREAD_ARCHITECTURE.md` §4.4).
 
 ## 3. Unidad persistente de trabajo
 
@@ -33,8 +33,8 @@ La unidad persistente es el THREAD, no el chat.
 
 ## 4. Descubrimiento
 
-- `warp/index/THREAD_INDEX.md` descubre THREADs y sus MANIFEST/HANDOFF.
-- `warp/index/DOCUMENT_INDEX.md` descubre el corpus documental y su autoridad de evolución.
+- `index/THREAD_INDEX.md` descubre THREADs y sus MANIFEST/HANDOFF.
+- `index/DOCUMENT_INDEX.md` descubre el corpus documental y su autoridad de evolución.
 - Ambos índices son derivados y no autoritativos.
 - Las formas canónicas de ambos índices viven en sus plantillas de `warp/core/`.
 
@@ -48,7 +48,7 @@ El corpus es común para lectura: cualquier THREAD puede consultar cualquier doc
 
 La autoridad de evolución de cada documento es **única**. Un THREAD sólo modifica directamente documentos bajo su autoridad. Si necesita cambiar conocimiento gobernado por otro THREAD, registra una propuesta en el HANDOFF del THREAD responsable.
 
-Cada THREAD tiene un único responsable, su `owner`: una persona de `warp/USERS.md`, nunca un agente. Cualquier participante activo puede trabajar en cualquier THREAD; la responsabilidad se ejerce al integrar en `knowledge`, que requiere al `owner` o su aprobación (`warp/core/THREAD_ARCHITECTURE.md` §4.5).
+Cada THREAD tiene un único responsable, su `owner`: una persona de `USERS.md`, nunca un agente. Cualquier participante activo puede trabajar en cualquier THREAD; la responsabilidad se ejerce al integrar en `knowledge`, que requiere al `owner` o su aprobación (`warp/core/THREAD_ARCHITECTURE.md` §4.5).
 
 Si un documento es semánticamente transversal y varias responsabilidades necesitan influir de forma estable, no se comparte la edición: se crea un THREAD gestor que centraliza su evolución y recibe inputs de los demás.
 
@@ -58,7 +58,7 @@ Git conserva la procedencia histórica. No es necesario añadir `created_by` u o
 
 El HANDOFF no es transición de sesión, resumen de conversación ni transferencia de agente.
 
-Es la cola persistente de propuestas, revisiones, necesidades o peticiones inter-THREAD todavía no resueltas. Cada entrada es un archivo en el buzón `warp/threads/<thread_id>/handoff/` (`warp/core/THREAD_ARCHITECTURE.md` §7).
+Es la cola persistente de propuestas, revisiones, necesidades o peticiones inter-THREAD todavía no resueltas. Cada entrada es un archivo en el buzón `threads/<thread_id>/handoff/` (`warp/core/THREAD_ARCHITECTURE.md` §7).
 
 Reglas:
 
@@ -122,3 +122,4 @@ La secuencia reutilizable de incorporación vive en `warp/core/THREAD_CONTEXT_BO
 | 2.1.0 | 2026-10-27 | Sólo `knowledge` es exigida, con árbol propio; las ramas del software pertenecen a su ciclo; la configuración del proyecto está bajo autoridad de `governance`. Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |
 | 2.2.0 | 2026-10-27 | `owner` como persona de `warp/USERS.md` y modelo de participación: cualquier participante activo trabaja; integrar requiere al `owner` o su aprobación. |
 | 2.3.0 | 2026-10-27 | HANDOFF como buzón por entradas: registrar es añadir un archivo; resolver es borrarlo en la misma decisión. |
+| 2.3.1 | 2026-10-27 | Rutas del proyecto en la raíz de la instancia (`corpus/`, `threads/`, `index/`, `USERS.md`); el método queda en `warp/`. Sin cambios de fondo. |

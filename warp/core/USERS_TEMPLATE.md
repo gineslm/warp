@@ -1,15 +1,15 @@
 # Warp — Plantilla de participantes
 
-**Versión:** 1.0.0  
+**Versión:** 1.0.1  
 **Estado:** Plantilla  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
 
 ## 1. Propósito
 
-Esta plantilla define la forma canónica de `warp/USERS.md`: la lista de participantes del proyecto.
+Esta plantilla define la forma canónica de `USERS.md`: la lista de participantes del proyecto.
 
-`warp/USERS.md` pertenece a la configuración del proyecto y está bajo autoridad del THREAD `governance` (`warp/core/THREAD_ARCHITECTURE.md` §4.4 y §16.1). Dar de alta, dar de baja o cambiar a un participante es una decisión de ese THREAD; otros THREADs lo proponen en su HANDOFF.
+`USERS.md` pertenece a la configuración del proyecto y está bajo autoridad del THREAD `governance` (`warp/core/THREAD_ARCHITECTURE.md` §4.4 y §16.1). Dar de alta, dar de baja o cambiar a un participante es una decisión de ese THREAD; otros THREADs lo proponen en su HANDOFF.
 
 ## 2. Principios
 
@@ -48,7 +48,7 @@ Esta plantilla define la forma canónica de `warp/USERS.md`: la lista de partici
 
 `warp/scripts/check_knowledge.py` comprueba que:
 
-- existe `warp/USERS.md` con la tabla canónica;
+- existe `USERS.md` con la tabla canónica;
 - cada `status` es `active` o `inactive`;
 - ningún `github` se repite;
 - hay al menos un participante `active`.

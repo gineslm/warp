@@ -1,6 +1,6 @@
 # example-notes — MANIFEST
 
-**Versión:** 1.0.3  
+**Versión:** 1.0.4  
 **Idioma:** español (España)
 
 ## Identidad
@@ -17,7 +17,7 @@ origin:
 repository:
   knowledge_branch: knowledge
 handoff:
-  path: warp/threads/example-notes/handoff/
+  path: threads/example-notes/handoff/
 ```
 
 ## Responsabilidad
@@ -26,7 +26,7 @@ Servir como THREAD de ejemplo, genérico e inventado, para mostrar cómo se rela
 
 ## Dentro de alcance
 
-- mantener `warp/corpus/NOTES.md` como documento de ejemplo bajo su autoridad;
+- mantener `corpus/NOTES.md` como documento de ejemplo bajo su autoridad;
 - ilustrar el formato mínimo de MANIFEST y del buzón de entradas definido en `warp/core/THREAD_ARCHITECTURE.md`.
 
 ## Fuera de alcance
@@ -40,7 +40,7 @@ Servir como THREAD de ejemplo, genérico e inventado, para mostrar cómo se rela
 
 ## Autoridad documental vigente
 
-- `warp/corpus/NOTES.md`
+- `corpus/NOTES.md`
 
 ## Historial
 
@@ -50,3 +50,4 @@ Servir como THREAD de ejemplo, genérico e inventado, para mostrar cómo se rela
 | 1.0.1 | 2026-10-27 | El ejemplo pasa a `examples/minimal/` con la estructura `warp/`; NOTES.md se mueve al corpus. |
 | 1.0.2 | 2026-10-27 | `owner` pasa a ser un participante de `warp/USERS.md`. |
 | 1.0.3 | 2026-10-27 | El HANDOFF pasa a ser el buzón `handoff/`, con una entrada de ejemplo. |
+| 1.0.4 | 2026-10-27 | Rutas del proyecto en la raíz de la instancia. |

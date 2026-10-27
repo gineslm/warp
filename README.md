@@ -556,23 +556,22 @@ Future directions are outside the current core:
 │       └── warp.py
 │
 ├── examples/
-│   └── minimal/                   # example instance
+│   └── minimal/                   # example instance (uses the method in this repository's `warp/`)
 │       ├── warp.yaml
-│       └── warp/
-│           ├── USERS.md
-│           ├── index/
-│           │   ├── THREAD_INDEX.md
-│           │   └── DOCUMENT_INDEX.md
-│           ├── threads/
-│           │   ├── governance/
-│           │   │   ├── MANIFEST.md
-│           │   │   └── handoff/
-│           │   └── example-notes/
-│           │       ├── MANIFEST.md
-│           │       └── handoff/
-│           │           └── explicar-registro-de-entradas.md
-│           └── corpus/
-│               └── NOTES.md
+│       ├── USERS.md
+│       ├── index/
+│       │   ├── THREAD_INDEX.md
+│       │   └── DOCUMENT_INDEX.md
+│       ├── threads/
+│       │   ├── governance/
+│       │   │   ├── MANIFEST.md
+│       │   │   └── handoff/
+│       │   └── example-notes/
+│       │       ├── MANIFEST.md
+│       │       └── handoff/
+│       │           └── explicar-registro-de-entradas.md
+│       └── corpus/
+│           └── NOTES.md
 │
 ├── tests/
 │   ├── test_check_knowledge.py
