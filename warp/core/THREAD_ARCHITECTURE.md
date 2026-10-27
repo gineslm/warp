@@ -1,6 +1,6 @@
 # Warp — Arquitectura de THREADs y conocimiento
 
-**Versión:** 2.7.0  
+**Versión:** 2.8.0  
 **Estado:** Especificación operativa  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -15,7 +15,7 @@ El sistema está diseñado para potenciar trabajo y validación humana, no para 
 
 ## 2. Principios fundamentales
 
-1. La conversación/agente es temporal; el repositorio es la memoria duradera.
+1. La conversación/agente es temporal; el repositorio es la memoria duradera. Ninguna memoria externa al repositorio (de agentes, de proyectos de chat o local) es fuente de verdad.
 2. Un THREAD existe si y sólo si existe su MANIFEST en `knowledge`.
 3. El agente se incorpora a un THREAD mediante su MANIFEST.
 4. Todo THREAD existente tiene exactamente un HANDOFF persistente.
@@ -481,7 +481,7 @@ Los documentos del método no forman parte del corpus ni figuran en `DOCUMENT_IN
 ### 16.2 `warp.yaml`
 
 ```yaml
-warp_version: 2.7.0          # versión del método
+warp_version: 2.8.0          # versión del método
 project:
   name: <nombre>
   repository: <organización/repositorio>
@@ -530,3 +530,4 @@ La arquitectura considera abiertas únicamente cuestiones que no alteran las inv
 | 2.5.0 | 2026-10-27 | HANDOFF como buzón por entradas: un archivo por entrada en `warp/threads/<thread_id>/handoff/`, con bloque de identidad, contexto y evidencia en prosa y dos zonas de escritura; el tipo `task` pasa a `request`. |
 | 2.6.0 | 2026-10-27 | §9.4 tareas y ramas de trabajo: una rama activa por tarea, nombre de la tarea igual al de la entrada que resuelve, una instancia por THREAD y directorios de trabajo separados; subsecciones del §9 numeradas. |
 | 2.7.0 | 2026-10-27 | §13: la decisión es el guardado de unión en `knowledge` y la rama conserva la deliberación. |
+| 2.8.0 | 2026-10-27 | El principio 1 excluye como fuente de verdad cualquier memoria externa al repositorio. |

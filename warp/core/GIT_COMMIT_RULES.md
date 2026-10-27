@@ -1,6 +1,6 @@
 # Cómo guardamos las decisiones en git
 
-**Versión:** 1.1.0  
+**Versión:** 1.2.0  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -12,6 +12,8 @@ Idea de fondo: **git ya guarda casi todo por su cuenta.** Nosotros solo añadimo
 La llave que da acceso al repositorio (el "token") **no se escribe en ningún documento**, ni siquiera como ejemplo. Motivo: git conserva para siempre todo lo que pasa por él; si algún día se guarda la llave de verdad, queda en el historial y ya no se borra de forma fiable, a la vista de cualquiera con acceso.
 
 La llave vive **fuera del repositorio** (en la configuración del ordenador o en un archivo que git tiene orden de ignorar). Aquí, como mucho, se dice que la llave se lee de fuera.
+
+Lo mismo vale para cualquier información que no deba quedar para siempre: datos personales, información confidencial de clientes o contratos. Como `knowledge` conserva también los guardados de cada rama, no basta con borrarlo antes de integrar: **lo que no puede quedar para siempre no se escribe en el repositorio, ni siquiera en un borrador.**
 
 ## 2. Idea central: un guardado = una decisión
 
@@ -172,3 +174,4 @@ Fíjate en lo que **no** lleva: ni lista de archivos, ni estado, ni código de r
 | 1.0.0 | 2026-09-09 | Versión publicada con Warp: un guardado = una decisión, el porqué en el mensaje, sin duplicar lo que git ya conserva. |
 | 1.0.1 | 2026-10-27 | Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |
 | 1.1.0 | 2026-10-27 | Dos niveles, decisión (guardado de unión en `knowledge`) y deliberación (guardados de la rama); lectura con `--first-parent`; línea `Sustituye: <sha>`; sin *squash*, *rebase* ni reescritura de la historia de `knowledge`. |
+| 1.2.0 | 2026-10-27 | §1 se extiende a toda información que no deba quedar para siempre, porque `knowledge` conserva también los guardados de la rama. |
