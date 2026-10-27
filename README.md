@@ -536,6 +536,7 @@ Future directions are outside the current core:
 .
 ├── README.md
 ├── README.es.md
+├── AGENTS.md
 ├── LICENSE
 ├── LICENSE-CODE
 ├── LICENSE-DOCS

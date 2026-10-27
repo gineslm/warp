@@ -536,6 +536,7 @@ Las líneas futuras quedan fuera del core actual:
 .
 ├── README.md
 ├── README.es.md
+├── AGENTS.md
 ├── LICENSE
 ├── LICENSE-CODE
 ├── LICENSE-DOCS
