@@ -1,6 +1,6 @@
 # Warp — Arquitectura de THREADs y conocimiento
 
-**Versión:** 2.10.0  
+**Versión:** 2.11.0  
 **Estado:** Especificación operativa  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -469,7 +469,7 @@ Los artefactos operativos de un THREAD se nombran por rol (`MANIFEST.md` y el bu
 | Categoría | Archivos | Autoridad |
 |---|---|---|
 | **sistema** | método (`warp/core/`) y herramientas (`warp/scripts/`) | ninguna en la instancia: viene de la distribución de Warp, es de solo lectura y solo cambia al actualizar de versión |
-| **derivados** | `warp/index/` | ninguna: se regeneran y nunca se editan a mano |
+| **derivados** | `warp/index/` y `warp.lock` | ninguna: se regeneran y nunca se editan a mano |
 | **corpus** | `warp/corpus/` | el THREAD que la declare en su MANIFEST; se descubre en `warp/index/DOCUMENT_INDEX.md` y es transferible (§11.4) |
 | **artefactos de THREAD** | `warp/threads/<thread_id>/` | el propio THREAD; su HANDOFF admite entradas de otros THREADs (§7.3) |
 | **configuración del proyecto** | `warp.yaml`, `warp/USERS.md` y la configuración de agentes y CI | el THREAD `governance` (§4.4) |
@@ -477,6 +477,8 @@ Los artefactos operativos de un THREAD se nombran por rol (`MANIFEST.md` y el bu
 La regla de autoridad única (§11.2) se cumple en las tres últimas categorías, cada una con su forma de asignarla.
 
 Los documentos del método no forman parte del corpus ni figuran en `DOCUMENT_INDEX.md`: el corpus es el conocimiento del proyecto, y el método es la forma de gestionarlo. Las mejoras al método no se proponen en un HANDOFF: se proponen a la distribución de Warp.
+
+`warp.lock` registra la versión instalada y la huella de cada archivo de la capa de sistema. El instalador lo genera y el checker comprueba que la capa de sistema coincide con él: así, que el método no se edita en la instancia deja de depender de la disciplina.
 
 ### 16.2 `warp.yaml`
 
@@ -535,3 +537,4 @@ La arquitectura considera abiertas únicamente cuestiones que no alteran las inv
 | 2.8.0 | 2026-10-27 | El principio 1 excluye como fuente de verdad cualquier memoria externa al repositorio. |
 | 2.9.0 | 2026-10-27 | §9.4: el PR de una tarea se dirige siempre a `knowledge`. Entrada para agentes en `AGENTS.md` (plantilla `AGENTS_TEMPLATE.md`). |
 | 2.10.0 | 2026-10-27 | Versión del método: `warp/VERSION` en la capa de sistema, con esquema MAJOR.MINOR.PATCH; `warp_version` coincide con ella. |
+| 2.11.0 | 2026-10-27 | `warp.lock` como derivado: huellas de la capa de sistema, comprobadas por el checker. |

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Warp: comprobador estructural de `knowledge`. Solo lee; no modifica."""
 
+import hashlib
 import os
 import re
 import subprocess
@@ -28,6 +29,8 @@ GOVERNANCE = "governance"
 CONFIG_DOCS = {"warp.yaml", "warp/USERS.md"}
 CORPUS = "warp/corpus/"
 PLACEHOLDERS = {".gitkeep"}
+SYSTEM_DIRS = ("warp/core", "warp/scripts")
+SYSTEM_FILES = ("warp/VERSION", "warp/LICENSE-DOCS", "warp/LICENSE-CODE")
 SECRETS = [
     ("GitHub token", re.compile(r"gh[pousr]_[A-Za-z0-9]{30,}")),
     ("GitHub PAT", re.compile(r"github_pat_[A-Za-z0-9_]{30,}")),
@@ -421,6 +424,47 @@ def git_toplevel(root):
         return root
 
 
+def system_files(root):
+    """Rutas de la capa de sistema presentes en `root`, relativas y ordenadas."""
+    out = [f for f in SYSTEM_FILES if os.path.isfile(os.path.join(root, *f.split("/")))]
+    for d in SYSTEM_DIRS:
+        for base, dirs, files in os.walk(os.path.join(root, *d.split("/"))):
+            dirs[:] = [x for x in dirs if x not in SKIP]
+            out += [rel(root, os.path.join(base, f)) for f in files
+                    if not f.endswith(".pyc")]
+    return sorted(out)
+
+
+def digest(path):
+    # Sin finales de línea: Git puede sacar los archivos con CRLF en Windows.
+    with open(path, "rb") as f:
+        return hashlib.sha256(f.read().replace(b"\r\n", b"\n")).hexdigest()
+
+
+def check_lock(root, rep):
+    p = os.path.join(root, "warp.lock")
+    if not os.path.isfile(p): return
+    listed, version = {}, None
+    for line in read(p).splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"): continue
+        if line.startswith("warp_version:"):
+            version = line.partition(":")[2].strip(); continue
+        h, _, path = line.partition("  ")
+        listed[path.strip()] = h.strip()
+    vfile = os.path.join(root, "warp", "VERSION")
+    if not os.path.isfile(vfile) or version != read(vfile).strip():
+        rep.error("warp.lock: warp_version '%s' no coincide con warp/VERSION." % version)
+    for path in sorted(set(system_files(root)) | set(listed)):
+        full = os.path.join(root, *path.split("/"))
+        if path not in listed:
+            rep.error("warp.lock: '%s' no está registrado; la capa de sistema no se edita en la instancia." % path)
+        elif not os.path.isfile(full):
+            rep.error("warp.lock: falta '%s'." % path)
+        elif digest(full) != listed[path]:
+            rep.error("warp.lock: '%s' no coincide con su huella; la capa de sistema no se edita en la instancia." % path)
+
+
 def check_secrets(root, rep):
     # Todo el repositorio, no solo la instancia: en la distribución la
     # instancia de ejemplo es un subdirectorio.
@@ -447,6 +491,7 @@ def main(argv):
     print("Comprobando coherencia del conocimiento en: %s" % root)
     rep = Report()
     enforcement, users = check_config(root, rep)
+    check_lock(root, rep)
     ids, mpaths, data, texts = check_threads(root, rep)
     check_owners(rep, data, users, enforcement)
     check_governance(rep, data, texts)

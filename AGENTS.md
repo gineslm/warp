@@ -22,6 +22,7 @@ Las instrucciones para agentes de un proyecto que usa Warp son otras: las define
 6. Valida antes de integrar:
    - `python warp/scripts/check_knowledge.py examples/minimal`
    - `python tests/test_check_knowledge.py`
+   - `python tests/test_warp_init.py`
 7. Integra solo con merge commit (`gh pr merge <n> --merge`); la persona confirma en el terminal. Nunca squash, rebase ni force-push.
 8. Después del merge: `main` actualizado y la rama local borrada.
 
