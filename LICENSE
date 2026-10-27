@@ -9,7 +9,7 @@ Este repositorio utiliza una licencia dual según el tipo de contenido.
 El código fuente, scripts y otros archivos ejecutables o programáticos se
 distribuyen bajo la MIT License.
 
-Ámbito previsto: `scripts/` y cualquier archivo de código, script o utilidad programática presente o futura.
+Ámbito previsto: `warp/scripts/`, `tests/` y cualquier archivo de código, script o utilidad programática presente o futura.
 
 Consulta [`LICENSE-CODE`](LICENSE-CODE) para el texto completo de la MIT License.
 
@@ -19,7 +19,7 @@ La documentación, metodología, arquitectura, especificaciones, plantillas,
 diagramas y demás contenido textual o conceptual se distribuyen bajo
 Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0).
 
-Ámbito previsto: `README.md`, `docs/` y demás documentación, metodología, especificaciones, plantillas, diagramas y contenido textual.
+Ámbito previsto: `README.md`, `warp/core/`, `examples/`, `docs/` y demás documentación, metodología, especificaciones, plantillas, diagramas y contenido textual.
 
 Puedes compartir y adaptar este material, incluso con fines comerciales,
 siempre que:

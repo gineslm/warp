@@ -4,7 +4,7 @@ Cola de inputs pendientes dirigidos a `example-notes`. Cualquier otro THREAD pue
 
 Actualmente no hay entradas pendientes.
 
-Estructura orientativa de una entrada (ver `docs/core/THREAD_ARCHITECTURE.md`, §7.3), a título ilustrativo — no es una entrada real:
+Estructura orientativa de una entrada (ver `warp/core/THREAD_ARCHITECTURE.md`, §7.3), a título ilustrativo — no es una entrada real:
 
 ```text
 origin_thread: <thread-id emisor>

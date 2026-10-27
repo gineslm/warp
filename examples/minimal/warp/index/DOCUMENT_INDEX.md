@@ -12,7 +12,7 @@ Artefacto derivado y no autoritativo de descubrimiento del corpus. Todos los THR
 
 | path | purpose / scope | authority_thread | authority_manifest |
 |---|---|---|---|
-| `docs/threads/example/NOTES.md` | Notas de ejemplo, genéricas e inventadas, del THREAD `example-notes`. | `example-notes` | `docs/threads/example/MANIFEST.md` |
+| `warp/corpus/NOTES.md` | Notas de ejemplo, genéricas e inventadas, del THREAD `example-notes`. | `example-notes` | `warp/threads/example-notes/MANIFEST.md` |
 
 ## Mantenimiento
 

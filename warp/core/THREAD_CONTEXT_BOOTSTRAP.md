@@ -1,6 +1,6 @@
 # Warp — Bootstrap de contexto de THREADs
 
-**Versión:** 2.1.0  
+**Versión:** 2.1.1  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Repositorio:** `tu-organización/tu-repositorio`  
@@ -10,7 +10,7 @@
 
 Este documento define la secuencia operativa detallada para incorporar una conversación/agente a Warp cuando la operación requiere más que la superficie mínima de `PROJECT_AGENT_CONTEXT.md`.
 
-El modelo subyacente vive en `docs/core/THREAD_ARCHITECTURE.md`. La conversación es temporal; el THREAD y el corpus viven en el repositorio.
+El modelo subyacente vive en `warp/core/THREAD_ARCHITECTURE.md`. La conversación es temporal; el THREAD y el corpus viven en el repositorio.
 
 ## 2. Secuencia por defecto
 
@@ -38,11 +38,11 @@ Nunca reconstruir el estado global desde una rama de trabajo ni desde el histór
 
 ### THREAD existente
 
-1. localizarlo en `docs/core/THREAD_INDEX.md`;
+1. localizarlo en `warp/index/THREAD_INDEX.md`;
 2. leer su MANIFEST;
 3. verificar estado, responsabilidad y autoridad documental;
 4. leer su único HANDOFF persistente;
-5. descubrir documentos relevantes mediante `docs/core/DOCUMENT_INDEX.md` y referencias del MANIFEST.
+5. descubrir documentos relevantes mediante `warp/index/DOCUMENT_INDEX.md` y referencias del MANIFEST.
 
 Para este caso ordinario no es necesario leer la arquitectura completa.
 
@@ -58,7 +58,7 @@ Si no existe un THREAD compatible:
 4. registrar `origin.type` y, cuando corresponda, `created_from_knowledge_commit`;
 5. consolidar ambos artefactos en `knowledge`;
 6. actualizar los índices derivados;
-7. ejecutar `python scripts/check_knowledge.py`.
+7. ejecutar `python warp/scripts/check_knowledge.py`.
 
 Un HANDOFF provisional puede preceder al MANIFEST cuando una responsabilidad nueva sea propuesta por otro THREAD. No existe THREAD hasta que se crea su MANIFEST.
 
@@ -135,7 +135,7 @@ Git conserva el historial; el HANDOFF vuelve a representar sólo el presente pen
 
 ## 9. Disciplina Git
 
-Antes de guardar cambios, leer/aplicar `docs/core/GIT_COMMIT_RULES.md`:
+Antes de guardar cambios, leer/aplicar `warp/core/GIT_COMMIT_RULES.md`:
 
 - un commit = una decisión;
 - el mensaje explica el porqué;
@@ -153,14 +153,14 @@ Para cerrar:
 3. consolidar conocimiento vigente;
 4. transferir autoridad documental que no pueda quedar sin responsable;
 5. actualizar MANIFEST e índices;
-6. ejecutar `python scripts/check_knowledge.py`;
+6. ejecutar `python warp/scripts/check_knowledge.py`;
 7. validar/tests cuando proceda.
 
 Finalizar una conversación ordinaria no equivale a cerrar el THREAD y no crea ni reemplaza su HANDOFF.
 
 ## 11. Comprobador de coherencia
 
-`scripts/check_knowledge.py` verifica estructura e índices sin modificar el repositorio.
+`warp/scripts/check_knowledge.py` verifica estructura e índices sin modificar el repositorio.
 
 Ejecutar especialmente cuando se modifiquen:
 
@@ -184,11 +184,11 @@ El checker no juzga significado, calidad de responsabilidad, oportunidad de una 
 | cerrar/archivar/reabrir THREAD | Arquitectura §15 |
 | cambiar el sistema de THREADs/reglas/bootstrap | Arquitectura + `PROJECT_WORKING_RULES.md` completos |
 | guardar cambios | `GIT_COMMIT_RULES.md` |
-| cambio estructural | `scripts/check_knowledge.py` |
+| cambio estructural | `warp/scripts/check_knowledge.py` |
 
 ## 13. Versión compacta
 
-> Trabaja contra `tu-organización/tu-repositorio`. Entra por `knowledge` y lee primero `PROJECT_AGENT_CONTEXT.md`. Usa los índices para localizar THREAD y documentos, conéctate mediante el MANIFEST, consulta el HANDOFF sólo como cola inter-THREAD pendiente y lee el corpus necesario. Para operaciones estructurales carga las reglas adicionales indicadas en la tabla de divulgación progresiva y ejecuta `scripts/check_knowledge.py` cuando corresponda.
+> Trabaja contra `tu-organización/tu-repositorio`. Entra por `knowledge` y lee primero `PROJECT_AGENT_CONTEXT.md`. Usa los índices para localizar THREAD y documentos, conéctate mediante el MANIFEST, consulta el HANDOFF sólo como cola inter-THREAD pendiente y lee el corpus necesario. Para operaciones estructurales carga las reglas adicionales indicadas en la tabla de divulgación progresiva y ejecuta `warp/scripts/check_knowledge.py` cuando corresponda.
 
 ## 14. Historial
 
@@ -196,3 +196,4 @@ El checker no juzga significado, calidad de responsabilidad, oportunidad de una 
 |---|---|---|
 | 2.0.0 | 2026-09-08 | Bootstrap consolidado conforme al modelo persistente de HANDOFF e índices materializados separados. |
 | 2.1.0 | 2026-09-08 | Se adopta divulgación progresiva y se elimina la lectura obligatoria de arquitectura/reglas completas en el caso ordinario. |
+| 2.1.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |

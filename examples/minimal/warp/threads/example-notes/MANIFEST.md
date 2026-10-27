@@ -1,6 +1,6 @@
 # example-notes — MANIFEST
 
-**Versión:** 1.0.0  
+**Versión:** 1.0.1  
 **Idioma:** español (España)
 
 ## Identidad
@@ -17,7 +17,7 @@ origin:
 repository:
   knowledge_branch: knowledge
 handoff:
-  path: docs/threads/example/HANDOFF.md
+  path: warp/threads/example-notes/HANDOFF.md
 ```
 
 ## Responsabilidad
@@ -26,8 +26,8 @@ Servir como THREAD de ejemplo, genérico e inventado, para mostrar cómo se rela
 
 ## Dentro de alcance
 
-- mantener `docs/threads/example/NOTES.md` como documento de ejemplo bajo su autoridad;
-- ilustrar el formato mínimo de MANIFEST y HANDOFF definido en `docs/core/THREAD_ARCHITECTURE.md`.
+- mantener `warp/corpus/NOTES.md` como documento de ejemplo bajo su autoridad;
+- ilustrar el formato mínimo de MANIFEST y HANDOFF definido en `warp/core/THREAD_ARCHITECTURE.md`.
 
 ## Fuera de alcance
 
@@ -35,15 +35,16 @@ Servir como THREAD de ejemplo, genérico e inventado, para mostrar cómo se rela
 
 ## Dependencias
 
-- `docs/core/THREAD_ARCHITECTURE.md` — modelo de THREADs.
-- `docs/core/PROJECT_WORKING_RULES.md` — reglas permanentes.
+- `warp/core/THREAD_ARCHITECTURE.md` — modelo de THREADs.
+- `warp/core/PROJECT_WORKING_RULES.md` — reglas permanentes.
 
 ## Autoridad documental vigente
 
-- `docs/threads/example/NOTES.md`
+- `warp/corpus/NOTES.md`
 
 ## Historial
 
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1.0.0 | 2026-09-09 | Alta del THREAD de ejemplo para validar la estructura del repositorio Warp. |
+| 1.0.1 | 2026-10-27 | El ejemplo pasa a `examples/minimal/` con la estructura `warp/`; NOTES.md se mueve al corpus. |

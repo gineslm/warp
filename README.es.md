@@ -324,7 +324,11 @@ Las invariantes que pueden comprobarse mecánicamente no deberían depender sól
 Warp incluye:
 
 ```bash
-python scripts/check_knowledge.py
+# en una instancia, desde su raíz
+python warp/scripts/check_knowledge.py
+
+# en este repositorio, sobre la instancia de ejemplo
+python warp/scripts/check_knowledge.py examples/minimal
 ```
 
 El comprobador valida, entre otras cosas:
@@ -531,33 +535,40 @@ Las líneas futuras quedan fuera del core actual:
 ```text
 .
 ├── README.md
+├── README.es.md
 ├── LICENSE
 ├── LICENSE-CODE
 ├── LICENSE-DOCS
 │
-├── docs/
+├── warp/                          # el método: lo que adopta un proyecto
 │   ├── core/
 │   │   ├── THREAD_ARCHITECTURE.md
 │   │   ├── PROJECT_WORKING_RULES.md
 │   │   ├── THREAD_CONTEXT_BOOTSTRAP.md
 │   │   ├── PROJECT_AGENT_CONTEXT.md
 │   │   ├── GIT_COMMIT_RULES.md
-│   │   ├── THREAD_INDEX.md
-│   │   ├── DOCUMENT_INDEX.md
 │   │   └── *_TEMPLATE.md
-│   │
-│   ├── threads/
-│   │   └── example/
-│   │       ├── MANIFEST.md
-│   │       └── HANDOFF.md
-│   │
-│   └── evaluaciones/
-│       ├── README.md
-│       ├── INFORME_VIABILIDAD.md
-│       └── INFORME_FASE2_GRAFO.md
+│   └── scripts/
+│       └── check_knowledge.py
 │
-└── scripts/
-    └── check_knowledge.py
+├── examples/
+│   └── minimal/                   # instancia de ejemplo
+│       └── warp/
+│           ├── index/
+│           │   ├── THREAD_INDEX.md
+│           │   └── DOCUMENT_INDEX.md
+│           ├── threads/
+│           │   └── example-notes/
+│           │       ├── MANIFEST.md
+│           │       └── HANDOFF.md
+│           └── corpus/
+│               └── NOTES.md
+│
+├── tests/
+│   └── test_check_knowledge.py
+│
+└── docs/
+    └── evaluaciones/
 ```
 
 `docs/evaluaciones/` recoge informes de evaluación y propuestas de evolución que todavía no forman parte del core canónico: no son metodología vigente, son análisis y disparadores para decisiones futuras.
@@ -566,7 +577,7 @@ Las líneas futuras quedan fuera del core actual:
 
 ## 15. Licencia
 
-Warp se distribuye bajo licencia dual: el código (`scripts/`) bajo **MIT**, y la documentación y metodología (`docs/`, `README.md`) bajo **CC BY-SA 4.0**.
+Warp se distribuye bajo licencia dual: el código (`warp/scripts/`, `tests/`) bajo **MIT**, y la documentación y metodología (`warp/core/`, `examples/`, `docs/`, `README.md`) bajo **CC BY-SA 4.0**.
 
 Consulta [`LICENSE`](LICENSE), [`LICENSE-CODE`](LICENSE-CODE) y [`LICENSE-DOCS`](LICENSE-DOCS).
 

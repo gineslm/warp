@@ -1,6 +1,6 @@
 # Warp — Reglas de trabajo del proyecto
 
-**Versión:** 2.0.0  
+**Versión:** 2.0.1  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Repositorio:** `tu-organización/tu-repositorio`  
@@ -10,7 +10,7 @@
 
 Estas reglas son el contrato operativo permanente de Warp. Existen para que el método, la trazabilidad, la coordinación entre THREADs y la producción de conocimiento no dependan de la memoria de una conversación.
 
-La arquitectura detallada vive en `docs/core/THREAD_ARCHITECTURE.md`.
+La arquitectura detallada vive en `warp/core/THREAD_ARCHITECTURE.md`.
 
 ## 2. Fuente de verdad y ramas
 
@@ -36,10 +36,10 @@ La unidad persistente es el THREAD, no el chat.
 
 ## 4. Descubrimiento
 
-- `docs/core/THREAD_INDEX.md` descubre THREADs y sus MANIFEST/HANDOFF.
-- `docs/core/DOCUMENT_INDEX.md` descubre el corpus documental y su autoridad de evolución.
+- `warp/index/THREAD_INDEX.md` descubre THREADs y sus MANIFEST/HANDOFF.
+- `warp/index/DOCUMENT_INDEX.md` descubre el corpus documental y su autoridad de evolución.
 - Ambos índices son derivados y no autoritativos.
-- Las formas canónicas de ambos índices viven en sus plantillas de `docs/core/`.
+- Las formas canónicas de ambos índices viven en sus plantillas de `warp/core/`.
 
 Si un índice contradice a su fuente autoritativa, prevalece la fuente autoritativa y el índice debe regenerarse.
 
@@ -71,7 +71,7 @@ Reglas:
 
 ## 7. Git como historial de decisiones
 
-La estrategia completa vive en `docs/core/GIT_COMMIT_RULES.md`.
+La estrategia completa vive en `warp/core/GIT_COMMIT_RULES.md`.
 
 Principio: **un commit = una decisión**.
 
@@ -111,7 +111,7 @@ Cerrar una sesión no crea un HANDOFF. Cerrar un THREAD tampoco elimina su HANDO
 
 ## 10. Punto de entrada operativo
 
-La secuencia reutilizable de incorporación vive en `docs/core/THREAD_CONTEXT_BOOTSTRAP.md` y el contexto mínimo para agentes en `docs/core/PROJECT_AGENT_CONTEXT.md`.
+La secuencia reutilizable de incorporación vive en `warp/core/THREAD_CONTEXT_BOOTSTRAP.md` y el contexto mínimo para agentes en `warp/core/PROJECT_AGENT_CONTEXT.md`.
 
 ## 11. Historial
 
@@ -119,3 +119,4 @@ La secuencia reutilizable de incorporación vive en `docs/core/THREAD_CONTEXT_BO
 |---|---|---|
 | 2.0.0 | 2026-09-08 | Consolidación de reglas conforme a Arquitectura 1.0.0: HANDOFF persistente, índices separados, autoridad documental única y Git como historial. |
 | 2.0.0-warp | 2026-09-09 | Generalización para la publicación pública de Warp: se retiran las reglas específicas del proyecto de dominio donde se desarrolló la metodología (datos raw/processed/derived, adquisición progresiva, modelo Station/Location/Evidence); el resto es la metodología reutilizable sin cambios de fondo. |
+| 2.0.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |
