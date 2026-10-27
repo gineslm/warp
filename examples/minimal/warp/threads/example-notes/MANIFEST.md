@@ -1,6 +1,6 @@
 # example-notes — MANIFEST
 
-**Versión:** 1.0.1  
+**Versión:** 1.0.2  
 **Idioma:** español (España)
 
 ## Identidad
@@ -9,7 +9,7 @@
 thread_id: example-notes
 domain: ejemplo de uso de la metodología Warp
 status: ACTIVE
-owner: persona o agente que mantiene este ejemplo
+owner: usuario-ejemplo
 current_cycle: 1
 origin:
   type: USER_DECLARED
@@ -48,3 +48,4 @@ Servir como THREAD de ejemplo, genérico e inventado, para mostrar cómo se rela
 |---|---|---|
 | 1.0.0 | 2026-09-09 | Alta del THREAD de ejemplo para validar la estructura del repositorio Warp. |
 | 1.0.1 | 2026-10-27 | El ejemplo pasa a `examples/minimal/` con la estructura `warp/`; NOTES.md se mueve al corpus. |
+| 1.0.2 | 2026-10-27 | `owner` pasa a ser un participante de `warp/USERS.md`. |

@@ -1,6 +1,7 @@
-warp_version: 2.3.0          # versión del método
+warp_version: 2.4.0          # versión del método
 project:
   name: Ejemplo mínimo de Warp
   repository: ejemplo/warp-minimal
   language: es-ES
 layout: knowledge-only       # knowledge-only | with-code
+enforcement: advisory        # advisory | strict

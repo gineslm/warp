@@ -1,6 +1,6 @@
 # Warp — Reglas de trabajo del proyecto
 
-**Versión:** 2.1.0  
+**Versión:** 2.2.0  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -47,6 +47,8 @@ Cada THREAD custodia el estado de un problema o línea de trabajo y gobierna la 
 El corpus es común para lectura: cualquier THREAD puede consultar cualquier documento necesario.
 
 La autoridad de evolución de cada documento es **única**. Un THREAD sólo modifica directamente documentos bajo su autoridad. Si necesita cambiar conocimiento gobernado por otro THREAD, registra una propuesta en el HANDOFF del THREAD responsable.
+
+Cada THREAD tiene un único responsable, su `owner`: una persona de `warp/USERS.md`, nunca un agente. Cualquier participante activo puede trabajar en cualquier THREAD; la responsabilidad se ejerce al integrar en `knowledge`, que requiere al `owner` o su aprobación (`warp/core/THREAD_ARCHITECTURE.md` §4.5).
 
 Si un documento es semánticamente transversal y varias responsabilidades necesitan influir de forma estable, no se comparte la edición: se crea un THREAD gestor que centraliza su evolución y recibe inputs de los demás.
 
@@ -118,3 +120,4 @@ La secuencia reutilizable de incorporación vive en `warp/core/THREAD_CONTEXT_BO
 | 2.0.0-warp | 2026-09-09 | Generalización para la publicación pública de Warp: se retiran las reglas específicas del proyecto de dominio donde se desarrolló la metodología (datos raw/processed/derived, adquisición progresiva, modelo Station/Location/Evidence); el resto es la metodología reutilizable sin cambios de fondo. |
 | 2.0.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |
 | 2.1.0 | 2026-10-27 | Sólo `knowledge` es exigida, con árbol propio; las ramas del software pertenecen a su ciclo; la configuración del proyecto está bajo autoridad de `governance`. Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |
+| 2.2.0 | 2026-10-27 | `owner` como persona de `warp/USERS.md` y modelo de participación: cualquier participante activo trabaja; integrar requiere al `owner` o su aprobación. |

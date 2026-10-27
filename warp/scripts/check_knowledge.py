@@ -20,6 +20,7 @@ SKIP = {".git", "data", "results", "__pycache__", ".pytest_cache"}
 REF_EXTS = {"md", "py", "csv", "json", "yml", "yaml", "txt", "toml"}
 MAX_SCAN = 2_000_000
 LAYOUTS = {"knowledge-only", "with-code"}
+ENFORCEMENT = {"advisory", "strict"}
 USER_STATUS = {"active", "inactive"}
 GOVERNANCE = "governance"
 CONFIG_DOCS = {"warp.yaml", "warp/USERS.md"}
@@ -289,29 +290,45 @@ def check_config(root, rep):
             rep.error("warp.yaml: falta project.%s." % k)
     if y.get("layout") not in LAYOUTS:
         rep.error("warp.yaml: layout '%s' no válido." % y.get("layout"))
+    enforcement = y.get("enforcement")
+    if enforcement not in ENFORCEMENT:
+        rep.error("warp.yaml: enforcement '%s' no válido." % enforcement)
+    users = {}
     p = os.path.join(root, "warp", "USERS.md")
     if not os.path.isfile(p):
-        rep.error("Falta warp/USERS.md."); return
+        rep.error("Falta warp/USERS.md."); return enforcement, users
     target = None
     for head, rows in tables(read(p)):
         low = [x.lower() for x in head]
         if {"github", "name", "status"} <= set(low):
             target = low, rows; break
     if not target:
-        rep.error("USERS.md: falta tabla canónica."); return
+        rep.error("USERS.md: falta tabla canónica."); return enforcement, users
     head, rows = target
     ix = {k: head.index(k) for k in ("github", "status")}
-    seen, active = set(), 0
     for r in rows:
         if len(r) <= max(ix.values()): continue
         gh, st = clean(r[ix["github"]]), clean(r[ix["status"]])
-        if gh in seen: rep.error("USERS.md: github duplicado '%s'." % gh)
-        seen.add(gh)
+        if gh in users: rep.error("USERS.md: github duplicado '%s'." % gh)
+        users[gh] = st
         if st not in USER_STATUS:
             rep.error("USERS.md: status '%s' no válido para '%s'." % (st, gh))
-        active += st == "active"
-    if not active:
+    if "active" not in users.values():
         rep.error("USERS.md: no hay ningún participante active.")
+    return enforcement, users
+
+
+def check_owners(rep, data, users, enforcement):
+    # Comprobaciones sobre personas: su severidad depende de `enforcement`.
+    report = rep.error if enforcement == "strict" else rep.warn
+    for mp, y in sorted(data.items()):
+        owner = y.get("owner")
+        if not owner: continue
+        if owner not in users:
+            report("%s: owner '%s' no figura en warp/USERS.md." % (mp, owner))
+        elif users[owner] != "active" and \
+                y.get("status") not in {"CLOSED", "ARCHIVED"}:
+            report("%s: owner '%s' no está active." % (mp, owner))
 
 
 def check_governance(rep, data, texts):
@@ -411,8 +428,9 @@ def main(argv):
         print("No se encontró una instancia Warp (warp.yaml)."); return 2
     print("Comprobando coherencia del conocimiento en: %s" % root)
     rep = Report()
-    check_config(root, rep)
+    enforcement, users = check_config(root, rep)
     ids, mpaths, data, texts = check_threads(root, rep)
+    check_owners(rep, data, users, enforcement)
     check_governance(rep, data, texts)
     check_thread_index(root, rep, mpaths, data)
     check_document_index(root, rep, ids, data, texts)
