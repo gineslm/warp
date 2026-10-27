@@ -1,6 +1,6 @@
 # Warp — Arquitectura de THREADs y conocimiento
 
-**Versión:** 2.6.0  
+**Versión:** 2.7.0  
 **Estado:** Especificación operativa  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -406,6 +406,8 @@ La lista de pendientes conserva sólo el presente abierto. Git conserva el pasad
 
 No se mantienen registros paralelos de decisiones terminadas salvo que documenten información que Git y el conocimiento vigente no puedan expresar.
 
+La decisión es el guardado de unión (merge commit) con que una tarea entra en `knowledge`; los guardados de su rama conservan la deliberación. Ambos niveles quedan en Git y se leen por separado con `--first-parent` (`warp/core/GIT_COMMIT_RULES.md` §2 y §6).
+
 ## 14. Autoridad de fuentes
 
 | Información | Fuente principal |
@@ -479,7 +481,7 @@ Los documentos del método no forman parte del corpus ni figuran en `DOCUMENT_IN
 ### 16.2 `warp.yaml`
 
 ```yaml
-warp_version: 2.6.0          # versión del método
+warp_version: 2.7.0          # versión del método
 project:
   name: <nombre>
   repository: <organización/repositorio>
@@ -527,3 +529,4 @@ La arquitectura considera abiertas únicamente cuestiones que no alteran las inv
 | 2.4.0 | 2026-10-27 | `owner` es un participante de `warp/USERS.md`, nunca un agente; §4.5 separa leer, trabajar e integrar, y la responsabilidad se ejerce al integrar; `enforcement` en `warp.yaml`. |
 | 2.5.0 | 2026-10-27 | HANDOFF como buzón por entradas: un archivo por entrada en `warp/threads/<thread_id>/handoff/`, con bloque de identidad, contexto y evidencia en prosa y dos zonas de escritura; el tipo `task` pasa a `request`. |
 | 2.6.0 | 2026-10-27 | §9.4 tareas y ramas de trabajo: una rama activa por tarea, nombre de la tarea igual al de la entrada que resuelve, una instancia por THREAD y directorios de trabajo separados; subsecciones del §9 numeradas. |
+| 2.7.0 | 2026-10-27 | §13: la decisión es el guardado de unión en `knowledge` y la rama conserva la deliberación. |
