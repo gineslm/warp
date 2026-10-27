@@ -537,6 +537,7 @@ Las líneas futuras quedan fuera del core actual:
 ├── README.md
 ├── README.es.md
 ├── AGENTS.md
+├── INSTALL.md
 ├── LICENSE
 ├── LICENSE-CODE
 ├── LICENSE-DOCS
@@ -551,7 +552,8 @@ Las líneas futuras quedan fuera del core actual:
 │   │   ├── GIT_COMMIT_RULES.md
 │   │   └── *_TEMPLATE.md
 │   └── scripts/
-│       └── check_knowledge.py
+│       ├── check_knowledge.py
+│       └── warp.py
 │
 ├── examples/
 │   └── minimal/                   # instancia de ejemplo
@@ -573,13 +575,16 @@ Las líneas futuras quedan fuera del core actual:
 │               └── NOTES.md
 │
 ├── tests/
-│   └── test_check_knowledge.py
+│   ├── test_check_knowledge.py
+│   └── test_warp_init.py
 │
 └── docs/
     └── evaluaciones/
 ```
 
 `docs/evaluaciones/` recoge informes de evaluación y propuestas de evolución que todavía no forman parte del core canónico: no son metodología vigente, son análisis y disparadores para decisiones futuras.
+
+Para instalar Warp en un proyecto, sigue [`INSTALL.md`](INSTALL.md).
 
 ---
 

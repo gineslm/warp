@@ -537,6 +537,7 @@ Future directions are outside the current core:
 ├── README.md
 ├── README.es.md
 ├── AGENTS.md
+├── INSTALL.md
 ├── LICENSE
 ├── LICENSE-CODE
 ├── LICENSE-DOCS
@@ -551,7 +552,8 @@ Future directions are outside the current core:
 │   │   ├── GIT_COMMIT_RULES.md
 │   │   └── *_TEMPLATE.md
 │   └── scripts/
-│       └── check_knowledge.py
+│       ├── check_knowledge.py
+│       └── warp.py
 │
 ├── examples/
 │   └── minimal/                   # example instance
@@ -573,13 +575,16 @@ Future directions are outside the current core:
 │               └── NOTES.md
 │
 ├── tests/
-│   └── test_check_knowledge.py
+│   ├── test_check_knowledge.py
+│   └── test_warp_init.py
 │
 └── docs/
     └── evaluaciones/
 ```
 
 `docs/evaluaciones/` collects evaluation reports and evolution proposals that aren't yet part of the canonical core: they aren't current methodology, they're analysis and triggers for future decisions.
+
+To install Warp in a project, follow [`INSTALL.md`](INSTALL.md) (in Spanish).
 
 ---
 
