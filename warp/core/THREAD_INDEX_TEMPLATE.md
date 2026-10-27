@@ -1,9 +1,8 @@
 # Warp — Plantilla de índice de THREADs
 
-**Versión:** 1.1.0  
+**Versión:** 1.1.1  
 **Estado:** Plantilla  
 **Idioma:** español (España)  
-**Repositorio:** `tu-organización/tu-repositorio`  
 **Rama raíz de conocimiento:** `knowledge`
 
 ## 1. Propósito
@@ -93,3 +92,4 @@ Antes de considerar válido un índice materializado:
 |---|---|---|
 | 1.0.0 | 2026-09-08 | Primera definición de la plantilla canónica de índice de THREADs. |
 | 1.1.0 | 2026-09-08 | Se hace obligatoria la referencia al único HANDOFF persistente de cada THREAD. |
+| 1.1.1 | 2026-10-27 | Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |

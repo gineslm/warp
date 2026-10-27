@@ -553,11 +553,16 @@ Future directions are outside the current core:
 │
 ├── examples/
 │   └── minimal/                   # example instance
+│       ├── warp.yaml
 │       └── warp/
+│           ├── USERS.md
 │           ├── index/
 │           │   ├── THREAD_INDEX.md
 │           │   └── DOCUMENT_INDEX.md
 │           ├── threads/
+│           │   ├── governance/
+│           │   │   ├── MANIFEST.md
+│           │   │   └── HANDOFF.md
 │           │   └── example-notes/
 │           │       ├── MANIFEST.md
 │           │       └── HANDOFF.md

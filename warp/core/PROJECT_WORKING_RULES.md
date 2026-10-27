@@ -1,9 +1,8 @@
 # Warp — Reglas de trabajo del proyecto
 
-**Versión:** 2.0.1  
+**Versión:** 2.1.0  
 **Estado:** Activo  
 **Idioma:** español (España)  
-**Repositorio:** `tu-organización/tu-repositorio`  
 **Rama raíz de conocimiento:** `knowledge`
 
 ## 1. Propósito
@@ -14,15 +13,13 @@ La arquitectura detallada vive en `warp/core/THREAD_ARCHITECTURE.md`.
 
 ## 2. Fuente de verdad y ramas
 
-```text
-knowledge → conocimiento y estructura consolidados
-develop   → integración del software
-main      → software estable/desplegable
-```
+Warp sólo exige la rama `knowledge`, con árbol propio: contiene únicamente la capa Warp de la instancia. Si el repositorio contiene también software (`layout: with-code` en `warp.yaml`), sus ramas pertenecen a su propio ciclo y `knowledge` nunca se fusiona en ellas. Leer el corpus desde el código es libre.
 
 Toda conversación nueva entra conceptualmente por `knowledge` antes de usar una rama de trabajo.
 
-Las ramas `agent/*`, `feature/*` u otras ramas temporales son espacios de trabajo, no fuentes alternativas de verdad global.
+Las ramas `agent/*` nacen de `knowledge`. Son espacios de trabajo, no fuentes alternativas de verdad global.
+
+La configuración del proyecto (`warp.yaml`, `warp/USERS.md`, configuración de agentes y CI) está bajo autoridad del THREAD `governance` (`warp/core/THREAD_ARCHITECTURE.md` §4.4).
 
 ## 3. Unidad persistente de trabajo
 
@@ -120,3 +117,4 @@ La secuencia reutilizable de incorporación vive en `warp/core/THREAD_CONTEXT_BO
 | 2.0.0 | 2026-09-08 | Consolidación de reglas conforme a Arquitectura 1.0.0: HANDOFF persistente, índices separados, autoridad documental única y Git como historial. |
 | 2.0.0-warp | 2026-09-09 | Generalización para la publicación pública de Warp: se retiran las reglas específicas del proyecto de dominio donde se desarrolló la metodología (datos raw/processed/derived, adquisición progresiva, modelo Station/Location/Evidence); el resto es la metodología reutilizable sin cambios de fondo. |
 | 2.0.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |
+| 2.1.0 | 2026-10-27 | Sólo `knowledge` es exigida, con árbol propio; las ramas del software pertenecen a su ciclo; la configuración del proyecto está bajo autoridad de `governance`. Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |

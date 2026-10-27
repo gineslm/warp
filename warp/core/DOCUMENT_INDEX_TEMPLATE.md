@@ -1,9 +1,8 @@
 # Warp — Plantilla de índice documental
 
-**Versión:** 1.0.0  
+**Versión:** 1.1.0  
 **Estado:** Plantilla  
 **Idioma:** español (España)  
-**Repositorio:** `tu-organización/tu-repositorio`  
 **Rama raíz de conocimiento:** `knowledge`
 
 ## 1. Propósito
@@ -26,6 +25,7 @@ El índice es **derivado y no autoritativo**. La autoridad de evolución debe po
 6. No se enumeran los THREADs consumidores o lectores de cada documento.
 7. El resumen de ámbito sirve sólo para descubrimiento; el conocimiento autoritativo está en el propio documento.
 8. Transferir la autoridad de evolución de un documento implica actualizar la responsabilidad/autoridad canónica correspondiente y después regenerar este índice.
+9. El índice lista exclusivamente documentos del corpus (`warp/corpus/`), y todo documento del corpus figura en él. La configuración del proyecto, el método y los artefactos de THREAD no se listan (`warp/core/THREAD_ARCHITECTURE.md` §16.1).
 
 ## 3. Plantilla
 
@@ -93,7 +93,8 @@ Git conserva la evolución; el documento conserva el conocimiento vigente; el í
 
 Antes de considerar válido un índice materializado:
 
-- cada `path` debe resolver a un documento existente en `knowledge`;
+- cada `path` debe resolver a un documento existente en `knowledge`, dentro de `warp/corpus/`;
+- todo documento de `warp/corpus/` debe tener su fila;
 - cada documento debe tener exactamente un `authority_thread`;
 - cada `authority_thread` debe resolver a un MANIFEST existente;
 - `authority_manifest` debe corresponder al THREAD indicado;

@@ -1,9 +1,8 @@
 # Warp — Contexto mínimo del proyecto para agentes
 
-**Versión:** 2.1.1  
+**Versión:** 2.2.0  
 **Estado:** Activo  
 **Idioma:** español (España)  
-**Repositorio:** `tu-organización/tu-repositorio`  
 **Rama raíz de conocimiento:** `knowledge`
 
 ## 1. Función
@@ -58,6 +57,7 @@ Para trabajo ordinario dentro de un THREAD ya existente, esta superficie es sufi
 | cambiar arquitectura, reglas, bootstrap o convenciones del sistema | `THREAD_ARCHITECTURE.md` + `PROJECT_WORKING_RULES.md` completos |
 | guardar cambios | `GIT_COMMIT_RULES.md` |
 | modificar MANIFESTs, HANDOFFs, índices o autoridad documental | además ejecutar `python warp/scripts/check_knowledge.py` antes de consolidar |
+| cambiar `warp.yaml`, `warp/USERS.md` o la configuración de agentes y CI | `THREAD_ARCHITECTURE.md` §4.4 y §16: es trabajo del THREAD `governance` |
 | trabajar dentro de tu THREAD en documentos bajo su autoridad | nada más: MANIFEST + HANDOFF + corpus relevante bastan |
 
 La divulgación progresiva reduce contexto, pero no reduce autoridad ni obligaciones. Si existe duda sobre una operación, se consulta la fuente canónica extensa antes de actuar.
@@ -73,6 +73,8 @@ La divulgación progresiva reduce contexto, pero no reduce autoridad ni obligaci
 - Plantilla de índice de THREADs: `warp/core/THREAD_INDEX_TEMPLATE.md`.
 - Plantilla de índice documental: `warp/core/DOCUMENT_INDEX_TEMPLATE.md`.
 - Comprobador estructural: `warp/scripts/check_knowledge.py`.
+- Configuración del proyecto: `warp.yaml`.
+- Participantes: `warp/USERS.md`.
 
 ## 6. Comandos de entrada
 
@@ -123,7 +125,7 @@ Antes de terminar:
 
 ## 9. Bloque compacto
 
-> Repositorio: `tu-organización/tu-repositorio`. Fuente de verdad: `knowledge`. Lee primero `warp/core/PROJECT_AGENT_CONTEXT.md`; después usa `THREAD_INDEX.md` / `DOCUMENT_INDEX.md`, conéctate mediante el MANIFEST y consulta el HANDOFF sólo como cola de inputs pendientes procedentes de otros THREADs. Lee el corpus necesario; sólo modifica documentos bajo autoridad de tu THREAD. Para operaciones estructurales o excepcionales, carga las fuentes indicadas en la tabla «Cuándo leer más». Un commit = una decisión y los secretos nunca se versionan.
+> Repositorio: el declarado en `warp.yaml`. Fuente de verdad: `knowledge`. Lee primero `warp/core/PROJECT_AGENT_CONTEXT.md`; después usa `THREAD_INDEX.md` / `DOCUMENT_INDEX.md`, conéctate mediante el MANIFEST y consulta el HANDOFF sólo como cola de inputs pendientes procedentes de otros THREADs. Lee el corpus necesario; sólo modifica documentos bajo autoridad de tu THREAD. Para operaciones estructurales o excepcionales, carga las fuentes indicadas en la tabla «Cuándo leer más». Un commit = una decisión y los secretos nunca se versionan.
 
 ## 10. Historial
 
@@ -132,3 +134,4 @@ Antes de terminar:
 | 2.0.0 | 2026-09-08 | Consolidación del contexto de agente conforme al modelo de HANDOFF persistente, índices separados y autoridad documental única. |
 | 2.1.0 | 2026-09-08 | Se adopta divulgación progresiva: el agente carga por defecto sólo el contexto mínimo y consulta arquitectura/reglas completas según la operación. |
 | 2.1.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |
+| 2.2.0 | 2026-10-27 | Nueva entrada en «Cuándo leer más» para la configuración del proyecto (THREAD `governance`); `warp.yaml` y `warp/USERS.md` entre las fuentes. Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |

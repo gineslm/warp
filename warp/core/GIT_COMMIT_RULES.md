@@ -1,9 +1,8 @@
 # Cómo guardamos las decisiones en git
 
-**Versión:** 1.0.0  
+**Versión:** 1.0.1  
 **Estado:** Activo  
 **Idioma:** español (España)  
-**Repositorio:** `tu-organización/tu-repositorio`  
 **Rama raíz de conocimiento:** `knowledge`
 
 Idea de fondo: **git ya guarda casi todo por su cuenta.** Nosotros solo añadimos lo único que git no puede saber: el *porqué* de cada decisión. Todo lo demás (fechas, quién, qué archivos cambiaron, el historial completo) lo lleva git solo, así que no lo copiamos a mano.
