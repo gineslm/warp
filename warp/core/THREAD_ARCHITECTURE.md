@@ -1,6 +1,6 @@
 # Warp — Arquitectura de THREADs y conocimiento
 
-**Versión:** 2.4.0  
+**Versión:** 2.5.0  
 **Estado:** Especificación operativa  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -122,7 +122,7 @@ Un THREAD tiene un único responsable, su `owner`, y puede tener muchos contribu
 |---|---|
 | Leer el corpus y conectar un agente a cualquier THREAD | cualquiera |
 | Trabajar en una rama del THREAD | cualquier participante `active` |
-| Registrar una entrada en el HANDOFF de otro THREAD | cualquier THREAD (§7.2) |
+| Registrar una entrada en el HANDOFF de otro THREAD | cualquier THREAD (§7.3) |
 | Integrar en `knowledge` cambios bajo autoridad del THREAD | su `owner`, o cualquier participante con aprobación del `owner` |
 | Cambiar el `owner` | el `owner` actual, o el `owner` de `governance` |
 
@@ -181,14 +181,9 @@ Git ya conserva autor, fecha, diff e historial; no deben duplicarse sin una func
 
 ### 7.1 Definición
 
-Cada THREAD tiene exactamente un HANDOFF persistente.
+Cada THREAD tiene exactamente un HANDOFF persistente: el **buzón** `warp/threads/<thread_id>/handoff/`.
 
-El HANDOFF es la **cola de inputs pendientes** dirigidos a la responsabilidad del THREAD:
-
-- propuestas;
-- revisiones;
-- necesidades;
-- tareas inter-THREAD.
+El HANDOFF es la **cola de inputs pendientes** dirigidos a la responsabilidad del THREAD: propuestas, revisiones, necesidades y peticiones de otros THREADs. Cada input es una **entrada**, y cada entrada es un archivo.
 
 El HANDOFF recoge exclusivamente inputs procedentes de otros THREADs. El trabajo propio de un THREAD no se encola aquí: se resuelve y se escribe directamente en los documentos bajo su autoridad.
 
@@ -200,39 +195,36 @@ No es:
 - archivo de decisiones terminadas;
 - mecanismo de transferencia de responsabilidad.
 
-### 7.2 Autoridad
+### 7.2 Entradas
 
-Cualquier THREAD distinto del receptor puede registrar una entrada en el HANDOFF receptor con contexto y evidencia suficientes.
-
-Sólo el THREAD propietario del HANDOFF puede:
-
-- evaluar la entrada;
-- cambiar su estado operativo;
-- resolverla;
-- modificar el conocimiento bajo su responsabilidad.
-
-### 7.3 Estructura conceptual
+Una entrada es un archivo `warp/threads/<thread_id>/handoff/<nombre>.md`. El `<nombre>` es descriptivo y en minúsculas con guiones (`formulario-pago-un-paso.md`), es único en el buzón y no es un código de catalogación (`warp/core/GIT_COMMIT_RULES.md` §4). Forma canónica: `warp/core/HANDOFF_ENTRY_TEMPLATE.md`.
 
 Una entrada es similar a un ADR en cuanto conserva el contexto de una decisión potencial mientras está abierta, aunque no todas las entradas sean decisiones arquitectónicas.
 
-Estructura mínima orientativa:
+Contiene un único bloque de identidad:
 
 ```yaml
-origin_thread:
-type: proposal | review | need | task
-summary:
-context:
-evidence:
-target_scope:
+origin_thread: <thread_id emisor>
+type: proposal | review | need | request
+summary: <una frase>
+target_scope: <documentos o ámbito afectados>
 status: proposed | in_review | deferred | ready_to_apply
-working_notes:
 ```
 
-Puede representarse como dos zonas lógicas:
+Le siguen dos secciones del emisor, `## Contexto` y `## Evidencia`, y una del receptor, `## Notas del receptor`. El contexto y la evidencia van en prosa porque suelen ser extensos; el bloque de identidad contiene sólo campos cortos y comprobables.
 
-| Entrada / propuesta | Estado / trabajo receptor |
-|---|---|
-| escribible por el emisor | gestionado exclusivamente por el THREAD receptor |
+Un buzón sin entradas puede contener un `.gitkeep` para que el directorio exista.
+
+### 7.3 Dos zonas y autoridad
+
+| Zona | Contenido | Quién la escribe |
+|---|---|---|
+| emisor | todos los campos salvo `status`; `## Contexto` y `## Evidencia` | el THREAD emisor, mientras la entrada esté en `proposed` |
+| receptor | `status` y `## Notas del receptor` | exclusivamente el THREAD receptor |
+
+- **Registrar** es añadir un archivo nuevo al buzón receptor, con contexto y evidencia suficientes. No requiere aprobación del receptor.
+- Sólo el THREAD receptor evalúa la entrada, cambia su estado, la resuelve y modifica el conocimiento bajo su autoridad.
+- Una entrada no es una decisión ni una dependencia por el mero hecho de existir.
 
 ### 7.4 Resolución
 
@@ -245,14 +237,16 @@ decisión terminal
     ↓
 cambio real o rechazo
     ↓
-retirar entrada del HANDOFF
+borrar el archivo de la entrada
     ↓
-MISMO COMMIT
+MISMA DECISIÓN integrada en knowledge
 ```
 
-Una entrada `deferred` sigue pendiente y permanece en el HANDOFF.
+Una entrada `deferred` sigue pendiente y permanece en el buzón.
 
-Cuando se resuelve, desaparece del HANDOFF. Git conserva la entrada retirada, la decisión y su motivo.
+Cuando se resuelve, su archivo desaparece. Git conserva la entrada retirada, la decisión y su motivo.
+
+Como cada entrada es un archivo propio, registrar y resolver entradas distintas en paralelo no genera conflictos de fusión.
 
 ## 8. Bootstrap de un agente y divulgación progresiva
 
@@ -445,14 +439,14 @@ warp/
 ├── scripts/            herramientas: comprobador estructural
 ├── index/              índices derivados (THREAD_INDEX.md, DOCUMENT_INDEX.md)
 ├── threads/
-│   └── <thread_id>/    artefactos operativos: MANIFEST.md, HANDOFF.md
+│   └── <thread_id>/    artefactos operativos: MANIFEST.md, handoff/
 ├── corpus/             documentos de conocimiento, organizados por tema
 └── USERS.md            participantes del proyecto
 ```
 
 La ubicación física no determina la autoridad documental: la declara el MANIFEST del THREAD responsable y la muestra `warp/index/DOCUMENT_INDEX.md`.
 
-Los artefactos operativos de un THREAD se nombran por rol (`MANIFEST.md`, `HANDOFF.md`) y viven en `warp/threads/<thread_id>/`. Los documentos de conocimiento viven en `warp/corpus/`, organizados por tema y nunca por THREAD: así se refuerza que no son silos privados, y transferir su autoridad (§11.4) no obliga a moverlos ni rompe sus rutas.
+Los artefactos operativos de un THREAD se nombran por rol (`MANIFEST.md` y el buzón `handoff/`) y viven en `warp/threads/<thread_id>/`. Los documentos de conocimiento viven en `warp/corpus/`, organizados por tema y nunca por THREAD: así se refuerza que no son silos privados, y transferir su autoridad (§11.4) no obliga a moverlos ni rompe sus rutas.
 
 ### 16.1 Categorías de archivo
 
@@ -461,7 +455,7 @@ Los artefactos operativos de un THREAD se nombran por rol (`MANIFEST.md`, `HANDO
 | **sistema** | método (`warp/core/`) y herramientas (`warp/scripts/`) | ninguna en la instancia: viene de la distribución de Warp, es de solo lectura y solo cambia al actualizar de versión |
 | **derivados** | `warp/index/` | ninguna: se regeneran y nunca se editan a mano |
 | **corpus** | `warp/corpus/` | el THREAD que la declare en su MANIFEST; se descubre en `warp/index/DOCUMENT_INDEX.md` y es transferible (§11.4) |
-| **artefactos de THREAD** | `warp/threads/<thread_id>/` | el propio THREAD; su HANDOFF admite entradas de otros THREADs (§7.2) |
+| **artefactos de THREAD** | `warp/threads/<thread_id>/` | el propio THREAD; su HANDOFF admite entradas de otros THREADs (§7.3) |
 | **configuración del proyecto** | `warp.yaml`, `warp/USERS.md` y la configuración de agentes y CI | el THREAD `governance` (§4.4) |
 
 La regla de autoridad única (§11.2) se cumple en las tres últimas categorías, cada una con su forma de asignarla.
@@ -471,7 +465,7 @@ Los documentos del método no forman parte del corpus ni figuran en `DOCUMENT_IN
 ### 16.2 `warp.yaml`
 
 ```yaml
-warp_version: 2.4.0          # versión del método
+warp_version: 2.5.0          # versión del método
 project:
   name: <nombre>
   repository: <organización/repositorio>
@@ -517,3 +511,4 @@ La arquitectura considera abiertas únicamente cuestiones que no alteran las inv
 | 2.2.0 | 2026-10-27 | Todo Warp pasa al espacio de nombres `warp/`; el corpus vive en `warp/corpus/`, separado de los THREADs y organizado por tema, para que transferir autoridad no mueva documentos. |
 | 2.3.0 | 2026-10-27 | `knowledge` como única rama exigida, con árbol propio y `layout`; THREAD `governance`; cinco categorías de archivo; `warp.yaml` y `warp/USERS.md`; `DOCUMENT_INDEX` limitado al corpus; los datos del proyecto salen del core. |
 | 2.4.0 | 2026-10-27 | `owner` es un participante de `warp/USERS.md`, nunca un agente; §4.5 separa leer, trabajar e integrar, y la responsabilidad se ejerce al integrar; `enforcement` en `warp.yaml`. |
+| 2.5.0 | 2026-10-27 | HANDOFF como buzón por entradas: un archivo por entrada en `warp/threads/<thread_id>/handoff/`, con bloque de identidad, contexto y evidencia en prosa y dos zonas de escritura; el tipo `task` pasa a `request`. |

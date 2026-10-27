@@ -21,11 +21,12 @@ INSTANCE = os.path.join(ROOT, "examples", "minimal")
 THREAD = os.path.join("warp", "threads", "example-notes")
 
 
-def entry(origin, with_type=True):
+def entry(origin, typ="proposal", contexto="Contexto de prueba.", extra=""):
     lines = ["origin_thread: %s" % origin]
-    if with_type: lines.append("type: proposal")
-    lines += ["summary: s", "status: proposed"]
-    return "\n```yaml\n%s\n```\n" % "\n".join(lines)
+    if typ: lines.append("type: %s" % typ)
+    lines += ["summary: s", "target_scope: warp/corpus/NOTES.md", "status: proposed"]
+    return ("# Entrada\n\n```yaml\n%s\n```\n%s\n## Contexto\n\n%s\n\n"
+            "## Evidencia\n\nEvidencia de prueba.\n" % ("\n".join(lines), extra, contexto))
 
 
 def writable(path):
@@ -77,19 +78,72 @@ class CheckKnowledge(unittest.TestCase):
         self.assertEqual(code, 1, out)
         self.assertIn("referencia inexistente 'warp/core/NO_EXISTE.md'", out)
 
+    def write_entry(self, name, text, thread=THREAD):
+        with open(os.path.join(self.root, thread, "handoff", name), "w",
+                  encoding="utf-8") as f:
+            f.write(text)
+
     def test_handoff_rechaza_trabajo_propio(self):
         # La clave por directorio debe coincidir en cualquier sistema operativo.
-        self.append(os.path.join(THREAD, "HANDOFF.md"), entry("example-notes"))
+        self.write_entry("propia.md", entry("example-notes"))
         code, out = self.run_checker()
         self.assertEqual(code, 1, out)
         self.assertIn("no admite trabajo propio", out)
 
     def test_entrada_sin_type_no_se_ignora(self):
-        self.append(os.path.join(THREAD, "HANDOFF.md"),
-                    entry("example-notes", with_type=False))
+        self.write_entry("sin-type.md", entry("governance", typ=None))
         code, out = self.run_checker()
         self.assertEqual(code, 1, out)
-        self.assertIn("type HANDOFF no válido", out)
+        self.assertIn("falta el campo 'type'", out)
+
+    def test_entrada_valida_de_otro_hilo(self):
+        self.write_entry("otra.md", entry("governance"))
+        code, out = self.run_checker()
+        self.assertEqual(code, 0, out)
+
+    def test_tipo_task_ya_no_es_valido(self):
+        self.write_entry("antigua.md", entry("governance", typ="task"))
+        code, out = self.run_checker()
+        self.assertEqual(code, 1, out)
+        self.assertIn("type 'task' no válido", out)
+
+    def test_entrada_sin_contexto(self):
+        self.write_entry("sin-contexto.md", entry("governance", contexto=""))
+        code, out = self.run_checker()
+        self.assertEqual(code, 1, out)
+        self.assertIn("falta `## Contexto` no vacía", out)
+
+    def test_entrada_con_dos_bloques_yaml(self):
+        self.write_entry("doble.md", entry("governance", extra="```yaml\nx: y\n```\n"))
+        code, out = self.run_checker()
+        self.assertEqual(code, 1, out)
+        self.assertIn("exactamente un bloque yaml (tiene 2)", out)
+
+    def test_entrada_de_hilo_inexistente(self):
+        self.write_entry("fantasma.md", entry("hilo-fantasma"))
+        code, out = self.run_checker()
+        self.assertEqual(code, 1, out)
+        self.assertIn("origin_thread inexistente 'hilo-fantasma'", out)
+
+    def test_archivo_no_md_en_el_buzon(self):
+        self.write_entry("notas.txt", "texto")
+        code, out = self.run_checker()
+        self.assertEqual(code, 1, out)
+        self.assertIn("el buzón solo admite entradas .md", out)
+
+    def test_handoff_path_antiguo_a_archivo(self):
+        self.replace(os.path.join(THREAD, "MANIFEST.md"),
+                     "path: warp/threads/example-notes/handoff/",
+                     "path: warp/threads/example-notes/HANDOFF.md")
+        code, out = self.run_checker()
+        self.assertEqual(code, 1, out)
+        self.assertIn("handoff.path debe ser 'warp/threads/example-notes/handoff/'", out)
+
+    def test_falta_el_buzon(self):
+        shutil.rmtree(os.path.join(self.root, "warp", "threads", "governance", "handoff"))
+        code, out = self.run_checker()
+        self.assertEqual(code, 1, out)
+        self.assertIn("falta el buzón handoff/", out)
 
     def test_ningun_no_anula_rutas_declaradas(self):
         self.replace(os.path.join(THREAD, "MANIFEST.md"),

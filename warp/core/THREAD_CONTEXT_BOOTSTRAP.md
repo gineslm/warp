@@ -1,6 +1,6 @@
 # Warp — Bootstrap de contexto de THREADs
 
-**Versión:** 2.1.2  
+**Versión:** 2.2.0  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -100,17 +100,12 @@ Antes de proponer o modificar una entrada HANDOFF, aplicar `THREAD_ARCHITECTURE.
 
 Cuando aparezca una necesidad fuera de la autoridad del THREAD:
 
-```text
-PROPUESTA
-Origen THREAD:
-THREAD receptor:
-Necesidad:
-Contexto:
-Evidencia:
-¿Bloquea?: sí/no
-```
+1. elegir un `<nombre>` descriptivo para la entrada (`formulario-pago-un-paso`);
+2. crear `warp/threads/<thread_id receptor>/handoff/<nombre>.md` a partir de `warp/core/HANDOFF_ENTRY_TEMPLATE.md`;
+3. rellenar el bloque de identidad (`origin_thread`, `type`, `summary`, `target_scope`, `status: proposed`);
+4. escribir `## Contexto` y `## Evidencia`, indicando si la necesidad bloquea el trabajo propio.
 
-Registrar la propuesta en el HANDOFF del receptor. El HANDOFF sólo admite inputs procedentes de otros THREADs; el trabajo propio no se encola. La entrada no implica aceptación ni dependencia automática.
+Registrar es añadir el archivo al buzón del receptor; no requiere su aprobación. El HANDOFF sólo admite inputs procedentes de otros THREADs; el trabajo propio no se encola. La entrada no implica aceptación ni dependencia automática.
 
 ## 8. Resolución de una entrada HANDOFF
 
@@ -197,3 +192,4 @@ El checker no juzga significado, calidad de responsabilidad, oportunidad de una 
 | 2.1.0 | 2026-09-08 | Se adopta divulgación progresiva y se elimina la lectura obligatoria de arquitectura/reglas completas en el caso ordinario. |
 | 2.1.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |
 | 2.1.2 | 2026-10-27 | Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |
+| 2.2.0 | 2026-10-27 | Registrar una propuesta es crear un archivo de entrada en el buzón del receptor a partir de `HANDOFF_ENTRY_TEMPLATE.md`. |

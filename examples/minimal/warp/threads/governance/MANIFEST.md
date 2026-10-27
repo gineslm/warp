@@ -1,6 +1,6 @@
 # governance — MANIFEST
 
-**Versión:** 1.0.0  
+**Versión:** 1.0.1  
 **Idioma:** español (España)
 
 ## Identidad
@@ -17,7 +17,7 @@ origin:
 repository:
   knowledge_branch: knowledge
 handoff:
-  path: warp/threads/governance/HANDOFF.md
+  path: warp/threads/governance/handoff/
 ```
 
 ## Responsabilidad
@@ -45,3 +45,4 @@ Gobernar la configuración del sistema Warp en este proyecto y sus participantes
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1.0.0 | 2026-10-27 | Alta del THREAD de gobierno de la instancia de ejemplo. |
+| 1.0.1 | 2026-10-27 | El HANDOFF pasa a ser el buzón `handoff/`. |

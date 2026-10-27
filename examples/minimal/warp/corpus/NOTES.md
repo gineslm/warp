@@ -2,4 +2,4 @@
 
 Este documento es un ejemplo genérico e inventado, bajo la autoridad del THREAD `example-notes`. No contiene conocimiento de dominio: sirve solo para mostrar que un documento del corpus tiene un único THREAD responsable de su evolución, descubrible desde `warp/index/DOCUMENT_INDEX.md`.
 
-Cualquier THREAD del proyecto podría leer este documento; solo `example-notes` puede modificarlo directamente. Si otro THREAD necesitara cambiarlo, registraría una propuesta en `warp/threads/example-notes/HANDOFF.md`.
+Cualquier THREAD del proyecto podría leer este documento; solo `example-notes` puede modificarlo directamente. Si otro THREAD necesitara cambiarlo, registraría una entrada en su buzón, `warp/threads/example-notes/handoff/`.

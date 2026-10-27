@@ -11,8 +11,10 @@ STATUS = {"PROPOSED", "ACTIVE", "BLOCKED", "CLOSED", "ARCHIVED"}
 ORIGINS = {"USER_DECLARED", "THREAD_DERIVED", "MIGRATED"}
 IDENTITY = {"thread_id", "domain", "status", "owner", "current_cycle",
             "origin", "repository", "handoff"}
-H_TYPES = {"proposal", "review", "need", "task"}
+H_TYPES = {"proposal", "review", "need", "request"}
 H_STATUS = {"proposed", "in_review", "deferred", "ready_to_apply"}
+H_FIELDS = ("origin_thread", "type", "summary", "target_scope", "status")
+H_SECTIONS = ("Contexto", "Evidencia")
 TEXT_EXTS = {".md", ".py", ".yml", ".yaml", ".txt", ".toml", ".ini",
              ".cfg", ".sh", ".example"}
 SPECIAL = {"requirements.txt", ".env", ".env.example", "Dockerfile"}
@@ -149,10 +151,10 @@ def authority_paths(text):
 def check_threads(root, rep):
     ids, mpaths, data, texts = {}, set(), {}, {}
     for d in thread_dirs(root):
-        mp, hp = os.path.join(d, "MANIFEST.md"), os.path.join(d, "HANDOFF.md")
+        mp, hp = os.path.join(d, "MANIFEST.md"), os.path.join(d, "handoff")
         mr = rel(root, mp); mpaths.add(mr)
-        if not os.path.isfile(hp):
-            rep.error("%s: falta HANDOFF.md." % rel(root, d))
+        if not os.path.isdir(hp):
+            rep.error("%s: falta el buzón handoff/." % rel(root, d))
         text = read(mp); texts[mr] = text
         y = yaml_block(text)
         if y is None:
@@ -179,13 +181,11 @@ def check_threads(root, rep):
                 r"[0-9a-f]{7,40}", repo["created_from_knowledge_commit"]):
             rep.warn("%s: created_from_knowledge_commit no parece SHA." % mr)
         ho = y.get("handoff")
-        canonical = rel(root, hp)
+        canonical = rel(root, hp) + "/"
         if not isinstance(ho, dict) or not ho.get("path"):
             rep.error("%s: falta handoff.path." % mr)
         elif ho["path"] != canonical:
             rep.error("%s: handoff.path debe ser '%s'." % (mr, canonical))
-        elif not os.path.isfile(os.path.join(root, ho["path"])):
-            rep.error("%s: handoff.path no existe." % mr)
         tid = y.get("thread_id")
         if tid in ids:
             rep.error("thread_id duplicado '%s'." % tid)
@@ -356,20 +356,33 @@ def check_handoffs(root, rep, ids, data):
     by_dir = {os.path.normpath(os.path.dirname(os.path.join(root, mp))): y
               for mp, y in data.items()}
     for d in thread_dirs(root):
-        hp = os.path.join(d, "HANDOFF.md")
-        if not os.path.isfile(hp): continue
+        box = os.path.join(d, "handoff")
+        if not os.path.isdir(box): continue
         receiver = by_dir.get(os.path.normpath(d), {}).get("thread_id")
-        for m in re.finditer(r"```ya?ml\s*\n(.*?)\n```", read(hp), re.S):
-            e = yaml_block("```yaml\n" + m.group(1) + "\n```")
-            if not e: continue
-            hr = rel(root, hp)
-            if e.get("type") not in H_TYPES:
-                rep.error("%s: type HANDOFF no válido." % hr)
+        for f in sorted(os.listdir(box)):
+            hp = os.path.join(box, f); hr = rel(root, hp)
+            if f in PLACEHOLDERS: continue
+            if not f.endswith(".md") or not os.path.isfile(hp):
+                rep.error("%s: el buzón solo admite entradas .md." % hr); continue
+            text = read(hp)
+            blocks = re.findall(r"```ya?ml\s*\n(.*?)\n```", text, re.S)
+            if len(blocks) != 1:
+                rep.error("%s: una entrada debe tener exactamente un bloque yaml (tiene %d)." %
+                          (hr, len(blocks))); continue
+            e = yaml_block("```yaml\n" + blocks[0] + "\n```") or {}
+            for k in H_FIELDS:
+                if not e.get(k):
+                    rep.error("%s: falta el campo '%s'." % (hr, k))
+            for title in H_SECTIONS:
+                if not section(text, title):
+                    rep.error("%s: falta `## %s` no vacía." % (hr, title))
+            if e.get("type") and e["type"] not in H_TYPES:
+                rep.error("%s: type '%s' no válido." % (hr, e["type"]))
             if e.get("status") and e["status"] not in H_STATUS:
-                rep.error("%s: status HANDOFF no válido." % hr)
+                rep.error("%s: status '%s' no válido." % (hr, e["status"]))
             origin = e.get("origin_thread")
             if not origin:
-                rep.error("%s: falta origin_thread." % hr)
+                continue
             elif origin not in ids:
                 rep.error("%s: origin_thread inexistente '%s'." % (hr, origin))
             elif origin == receiver:
