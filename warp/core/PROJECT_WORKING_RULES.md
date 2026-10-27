@@ -1,6 +1,6 @@
 # Warp — Reglas de trabajo del proyecto
 
-**Versión:** 2.2.0  
+**Versión:** 2.3.0  
 **Estado:** Activo  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -58,14 +58,14 @@ Git conserva la procedencia histórica. No es necesario añadir `created_by` u o
 
 El HANDOFF no es transición de sesión, resumen de conversación ni transferencia de agente.
 
-Es la cola persistente de propuestas, revisiones, necesidades o tareas inter-THREAD todavía no resueltas.
+Es la cola persistente de propuestas, revisiones, necesidades o peticiones inter-THREAD todavía no resueltas. Cada entrada es un archivo en el buzón `warp/threads/<thread_id>/handoff/` (`warp/core/THREAD_ARCHITECTURE.md` §7).
 
 Reglas:
 
-1. cualquier THREAD puede registrar una entrada dirigida al receptor con contexto y evidencia;
+1. cualquier THREAD puede registrar una entrada dirigida al receptor, añadiendo un archivo a su buzón con contexto y evidencia;
 2. sólo el THREAD receptor puede gestionar su estado y resolverla;
 3. estados terminales no permanecen en el HANDOFF;
-4. al resolverse, la entrada se retira en el mismo commit que aplica la decisión o registra su rechazo;
+4. al resolverse, el archivo de la entrada se borra en la misma decisión que aplica el cambio o registra su rechazo;
 5. Git conserva el historial y el mensaje del commit conserva el porqué.
 
 ## 7. Git como historial de decisiones
@@ -121,3 +121,4 @@ La secuencia reutilizable de incorporación vive en `warp/core/THREAD_CONTEXT_BO
 | 2.0.1 | 2026-10-27 | Rutas actualizadas al espacio de nombres `warp/` (`warp/core/`, `warp/index/`, `warp/scripts/`), sin cambios de fondo. |
 | 2.1.0 | 2026-10-27 | Sólo `knowledge` es exigida, con árbol propio; las ramas del software pertenecen a su ciclo; la configuración del proyecto está bajo autoridad de `governance`. Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |
 | 2.2.0 | 2026-10-27 | `owner` como persona de `warp/USERS.md` y modelo de participación: cualquier participante activo trabaja; integrar requiere al `owner` o su aprobación. |
+| 2.3.0 | 2026-10-27 | HANDOFF como buzón por entradas: registrar es añadir un archivo; resolver es borrarlo en la misma decisión. |

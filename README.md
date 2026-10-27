@@ -562,10 +562,11 @@ Future directions are outside the current core:
 │           ├── threads/
 │           │   ├── governance/
 │           │   │   ├── MANIFEST.md
-│           │   │   └── HANDOFF.md
+│           │   │   └── handoff/
 │           │   └── example-notes/
 │           │       ├── MANIFEST.md
-│           │       └── HANDOFF.md
+│           │       └── handoff/
+│           │           └── explicar-registro-de-entradas.md
 │           └── corpus/
 │               └── NOTES.md
 │

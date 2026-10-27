@@ -562,10 +562,11 @@ Las líneas futuras quedan fuera del core actual:
 │           ├── threads/
 │           │   ├── governance/
 │           │   │   ├── MANIFEST.md
-│           │   │   └── HANDOFF.md
+│           │   │   └── handoff/
 │           │   └── example-notes/
 │           │       ├── MANIFEST.md
-│           │       └── HANDOFF.md
+│           │       └── handoff/
+│           │           └── explicar-registro-de-entradas.md
 │           └── corpus/
 │               └── NOTES.md
 │

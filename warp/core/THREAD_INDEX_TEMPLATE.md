@@ -1,6 +1,6 @@
 # Warp — Plantilla de índice de THREADs
 
-**Versión:** 1.1.1  
+**Versión:** 1.2.0  
 **Estado:** Plantilla  
 **Idioma:** español (España)  
 **Rama raíz de conocimiento:** `knowledge`
@@ -43,7 +43,7 @@ Artefacto derivado y no autoritativo de descubrimiento. Se reconstruye desde los
 
 | thread_id | status | domain | responsibility | MANIFEST | HANDOFF |
 |---|---|---|---|---|---|
-| `<thread-id>` | `<status>` | `<dominio>` | `<responsabilidad resumida>` | `<ruta/MANIFEST.md>` | `<ruta/HANDOFF.md>` |
+| `<thread-id>` | `<status>` | `<dominio>` | `<responsabilidad resumida>` | `<ruta/MANIFEST.md>` | `<ruta/handoff/>` |
 
 ## Mantenimiento
 
@@ -93,3 +93,4 @@ Antes de considerar válido un índice materializado:
 | 1.0.0 | 2026-09-08 | Primera definición de la plantilla canónica de índice de THREADs. |
 | 1.1.0 | 2026-09-08 | Se hace obligatoria la referencia al único HANDOFF persistente de cada THREAD. |
 | 1.1.1 | 2026-10-27 | Los datos del proyecto (repositorio) salen del documento y pasan a `warp.yaml`. |
+| 1.2.0 | 2026-10-27 | La columna HANDOFF apunta al buzón `warp/threads/<thread_id>/handoff/`. |
