@@ -2,7 +2,8 @@
   "autoMemoryEnabled": false,
   "permissions": {
     "ask": [
-      "Bash(gh pr merge *)"
+      "Bash(gh pr merge *)",
+      "Bash(gh release create *)"
     ],
     "deny": [
       "Bash(gh pr merge *--squash*)",

@@ -36,7 +36,7 @@ Cuando `main` acumula un conjunto coherente de cambios en el método, y solo si 
 2. Tras el merge, con `main` actualizado: `python tools/build_package.py`.
 3. Enseña las notas de la versión y espera confirmación.
 4. Etiqueta anotada sobre el merge: `git tag -a vX.Y.Z <sha> -F <notas>` y `git push origin vX.Y.Z`.
-5. Release con el paquete adjunto: `gh release create vX.Y.Z dist/warp-X.Y.Z.zip --title "Warp X.Y.Z" --notes-file <notas>`.
+5. Release con el paquete adjunto: `gh release create vX.Y.Z dist/warp-X.Y.Z.zip --title "Warp X.Y.Z" --notes-file <notas>`. Claude Code pide confirmación en el terminal: publicar es una decisión de la persona.
 
 ## Qué no se hace
 
