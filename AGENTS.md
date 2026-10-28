@@ -12,6 +12,7 @@ Las instrucciones para agentes de un proyecto que usa Warp son otras: las define
 - `tests/` — pruebas del checker, del instalador y del paquete.
 - `tools/` — herramientas de la distribución (no se instalan): `build_package.py` genera el paquete descargable.
 - `docs/evaluaciones/` — evaluaciones y propuestas; no son metodología vigente.
+- `docs/img/` — imágenes de la documentación (esquema de la arquitectura del README).
 
 ## Cómo se trabaja
 
