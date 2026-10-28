@@ -10,6 +10,8 @@ La idea base es sencilla:
 
 > **la conversación es efímera; el repositorio es la memoria durable.**
 
+→ Esquema visual: [cómo funciona Warp de un vistazo](docs/img/warp-architecture.png) — un hilo en detalle y las capas de una instancia.
+
 Warp no nació como un ejercicio abstracto de arquitectura. Surgió durante la investigación **Design to Code**, al comprobar que una metodología por etapas podía estructurar bien el proceso, pero no resolvía por sí sola un problema distinto: **cómo coordinar contextos aislados sin perder coherencia, trazabilidad ni responsabilidad**.
 
 → Investigación de origen: [Design to Code](https://github.com/gineslm/design-to-code)
@@ -582,7 +584,8 @@ Las líneas futuras quedan fuera del core actual:
 │   └── build_package.py
 │
 └── docs/
-    └── evaluaciones/
+    ├── evaluaciones/
+    └── img/
 ```
 
 `docs/evaluaciones/` recoge informes de evaluación y propuestas de evolución que todavía no forman parte del core canónico: no son metodología vigente, son análisis y disparadores para decisiones futuras.
